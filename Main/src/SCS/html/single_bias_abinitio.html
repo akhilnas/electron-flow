@@ -1,0 +1,782 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>single_bias_abinitio</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-05-22"><meta name="DC.source" content="single_bias_abinitio.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> single_bias_abinitio()
+
+<span class="comment">% All Input Files of Different Widths</span>
+files_SP = {<span class="string">'stack_files/SP/3_2nm.txt'</span> , <span class="string">'stack_files/SP/3_9nm.txt'</span> ,<span class="keyword">...</span>
+    <span class="string">'stack_files/SP/5_4nm.txt'</span> , <span class="string">'stack_files/SP/8_7nm.txt'</span> ,<span class="keyword">...</span>
+    <span class="string">'stack_files/SP/10_3nm.txt'</span> };
+files_DG = {<span class="string">'stack_files/DG/3_2nm.txt'</span> , <span class="string">'stack_files/DG/3_9nm.txt'</span> ,<span class="keyword">...</span>
+    <span class="string">'stack_files/DG/5_4nm.txt'</span> , <span class="string">'stack_files/DG/8_7nm.txt'</span> ,<span class="keyword">...</span>
+    <span class="string">'stack_files/DG/10_3nm.txt'</span> };
+
+<span class="keyword">for</span> fileloop = 1:length(files_SP)-1
+
+    <span class="comment">% Selection of n-type(n) or p-type(p) simulation</span>
+    Simulation_type = <span class="string">'n'</span>;
+
+    <span class="comment">% Selection of Simulation Procedure</span>
+    <span class="comment">% Optimization of Fitting Factors to Ab-initio data(optimization)</span>
+    <span class="comment">% Sweep of Fitting factor over various values(sweep)</span>
+    Simulation_procedure = <span class="string">'optimization'</span>;
+
+    <span class="comment">% Processing of Input File for Schrodinger-Poisson solver</span>
+    input_file_SP = files_SP{fileloop};
+    OutGenerate=generate(input_file_SP);
+
+    <span class="comment">% Selection of Appropriate</span>
+    <span class="comment">% 1 for 3.2 nm</span>
+    <span class="comment">% 2 for 3.9 nm</span>
+    <span class="comment">% 3 for 5.4 nm</span>
+    <span class="comment">% 4 for 8.7 nm</span>
+    <span class="comment">% 5 for 10.3 nm</span>
+    wchoice = fileloop;
+
+    H=getH(OutGenerate);
+    H=sparse(H);
+
+<span class="keyword">if</span> wchoice == 4
+<span class="comment">% Ab-initio data for 8.7 nm fin width</span>
+Extra_electron = [-0, -0.00020408, -0.00040816, -0.00061224, -0.00081633,<span class="keyword">...</span><span class="comment">.</span>
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,<span class="keyword">...</span><span class="comment">.</span>
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,<span class="keyword">...</span>
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,<span class="keyword">...</span>
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,<span class="keyword">...</span>
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,<span class="keyword">...</span>
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,<span class="keyword">...</span>
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,<span class="keyword">...</span>
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,<span class="keyword">...</span>
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01     ];
+Gate_Bias = [0   ,  0.42212308,  0.44607946,  0.46255743,  0.47595953,<span class="keyword">...</span>
+        0.48765822,  0.49826737,  0.50811615,  0.5173989 ,  0.52624297,<span class="keyword">...</span>
+        0.53473513,  0.5429375 ,  0.55089615,  0.55864624,  0.56621529,<span class="keyword">...</span>
+        0.57362521,  0.58089533,  0.58803734,  0.595065  ,  0.6019887 ,<span class="keyword">...</span>
+        0.6088173 ,  0.61555846,  0.62221998,  0.62880525,  0.63532063,<span class="keyword">...</span>
+        0.64177207,  0.64816184,  0.65449354,  0.66077104,  0.66699734,<span class="keyword">...</span>
+        0.67317528,  0.67930715,  0.68539533,  0.69144191,  0.69744886,<span class="keyword">...</span>
+        0.70341794,  0.70935083,  0.71524906,  0.72111408,  0.72694725,<span class="keyword">...</span>
+        0.73274979,  0.73852292,  0.74426772,  0.74998524,  0.75567646,<span class="keyword">...</span>
+        0.76134231,  0.76698366,  0.77260134,  0.77819613,  0.78376877];
+<span class="keyword">elseif</span> wchoice == 3
+<span class="comment">% Data for 5.46 nm device fin width</span>
+Extra_electron = [-0 , -0.00020408, -0.00040816, -0.00061224, -0.00081633,<span class="keyword">...</span>
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,<span class="keyword">...</span>
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,<span class="keyword">...</span>
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,<span class="keyword">...</span>
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,<span class="keyword">...</span>
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,<span class="keyword">...</span>
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,<span class="keyword">...</span>
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,<span class="keyword">...</span>
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,<span class="keyword">...</span>
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01      ];
+Gate_Bias = [0.        ,  0.44933436,  0.47257258,  0.4883634 ,  0.5010991 ,<span class="keyword">...</span>
+        0.5121562 ,  0.52214786,  0.53140517,  0.54011577,  0.54840932,<span class="keyword">...</span>
+        0.5563719 ,  0.5640628 ,  0.57153152,  0.57881053,  0.5859266 ,<span class="keyword">...</span>
+        0.59290101,  0.59975093,  0.6064904 ,  0.6131311 ,  0.6196828 ,<span class="keyword">...</span>
+        0.62615379,  0.63255117,  0.63888159,  0.64514928,  0.65135941,<span class="keyword">...</span>
+        0.65751605,  0.66362283,  0.66968298,  0.67569935,  0.68167453,<span class="keyword">...</span>
+        0.68761085,  0.69351043,  0.69937516,  0.7052068 ,  0.71100695,<span class="keyword">...</span>
+        0.71677663,  0.72251815,  0.72823211,  0.73391979,  0.73958226,<span class="keyword">...</span>
+        0.7452205 ,  0.75083545,  0.75642763,  0.76199875,  0.76754836,<span class="keyword">...</span>
+        0.77307821,  0.77858859,  0.78408011,  0.78955337,  0.79500894];
+<span class="keyword">elseif</span> wchoice == 1
+<span class="comment">% Data for 3.2 nm device fin width</span>
+Extra_electron = [-0        , -0.00020408, -0.00040816, -0.00061224, -0.00081633,<span class="keyword">...</span>
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,<span class="keyword">...</span>
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,<span class="keyword">...</span>
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,<span class="keyword">...</span>
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,<span class="keyword">...</span>
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,<span class="keyword">...</span>
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,<span class="keyword">...</span>
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,<span class="keyword">...</span>
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,<span class="keyword">...</span>
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01];
+Gate_Bias = [0.        ,  0.48374189,  0.50645215,  0.52172187,  0.53394579,<span class="keyword">...</span>
+        0.54450006,  0.55399781,  0.5627661 ,  0.57100015,  0.57882589,<span class="keyword">...</span>
+        0.5863293 ,  0.5935745 ,  0.60060139,  0.60744706,  0.61413807,<span class="keyword">...</span>
+        0.62069256,  0.6271357 ,  0.63347464,  0.6397224 ,  0.64588923,<span class="keyword">...</span>
+        0.65198315,  0.65801115,  0.66397925,  0.66989268,  0.67575598,<span class="keyword">...</span>
+        0.68157314,  0.68734768,  0.69308273,  0.69878106,  0.70444517,<span class="keyword">...</span>
+        0.71007729,  0.71567942,  0.7212534 ,  0.72680087,  0.73232334,<span class="keyword">...</span>
+        0.73782219,  0.74329866,  0.74875391,  0.754189  ,  0.75960491,<span class="keyword">...</span>
+        0.76500254,  0.77038271,  0.77574622,  0.78109377,  0.78642604,<span class="keyword">...</span>
+        0.79174363,  0.79704715,  0.80233713,  0.80761407,  0.81287846];
+<span class="keyword">elseif</span> wchoice == 2
+<span class="comment">% Data for 3.9 nm device fin width</span>
+Extra_electron = [-0, -0.00020408, -0.00040816, -0.00061224, -0.00081633,<span class="keyword">...</span>
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,<span class="keyword">...</span>
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,<span class="keyword">...</span>
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,<span class="keyword">...</span>
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,<span class="keyword">...</span>
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,<span class="keyword">...</span>
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,<span class="keyword">...</span>
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,<span class="keyword">...</span>
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,<span class="keyword">...</span>
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01  ];
+Gate_Bias = [0,  0.47377065,  0.4966183 ,  0.51202585,  0.52438554,<span class="keyword">...</span>
+        0.53507386,  0.54470391,  0.55360277,  0.56196564,  0.56991844,<span class="keyword">...</span>
+        0.57754713,  0.58491305,  0.59206145,  0.59902673,  0.6058356 ,<span class="keyword">...</span>
+        0.61250924,  0.61906674,  0.62551796,  0.63187657,  0.63815258,<span class="keyword">...</span>
+        0.64435356,  0.65048682,  0.65655812,  0.66257344,  0.66853656,<span class="keyword">...</span>
+        0.67445171,  0.68032241,  0.68615178,  0.69194239,  0.69769678,<span class="keyword">...</span>
+        0.7034177 ,  0.7091068 ,  0.71476594,  0.72039673,  0.72600069,<span class="keyword">...</span>
+        0.73157919,  0.73713402,  0.74266526,  0.74817452,  0.75366228,<span class="keyword">...</span>
+        0.75913048,  0.76457938,  0.77000978,  0.77542242,  0.78081798,<span class="keyword">...</span>
+        0.78619707,  0.79156029,  0.79690819,  0.80224127,  0.80756004];
+<span class="keyword">elseif</span> wchoice == 5
+<span class="comment">% Data for 10.3 nm device fin width</span>
+Extra_electron = [-0, -0.00020408, -0.00040816, -0.00061224, -0.00081633,<span class="keyword">...</span>
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,<span class="keyword">...</span>
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,<span class="keyword">...</span>
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,<span class="keyword">...</span>
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,<span class="keyword">...</span>
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,<span class="keyword">...</span>
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,<span class="keyword">...</span>
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,<span class="keyword">...</span>
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,<span class="keyword">...</span>
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01 ];
+Gate_Bias = [0,  0.41619826,  0.44048321,  0.45727504,  0.47096818,<span class="keyword">...</span><span class="comment">.</span>
+        0.48294097,  0.49380834,  0.50390104,  0.51341307,  0.52247307,<span class="keyword">...</span>
+        0.5311686 ,  0.53956254,  0.54770167,  0.55562186,  0.56335936,<span class="keyword">...</span>
+        0.57091603,  0.57832723,  0.58560369,  0.59275826,  0.59980181,<span class="keyword">...</span>
+        0.60674939,  0.61359201,  0.62035398,  0.62703555,  0.63364227,<span class="keyword">...</span>
+        0.64017891,  0.64665301,  0.6530625 ,  0.65941392,  0.6657105 ,<span class="keyword">...</span>
+        0.67195519,  0.67815068,  0.68429947,  0.69040383,  0.69646588,<span class="keyword">...</span>
+        0.70248757,  0.7084707 ,  0.71441698,  0.72032796,  0.72620511,<span class="keyword">...</span>
+        0.73204981,  0.73786334,  0.74364691,  0.74940165,  0.75512863,<span class="keyword">...</span>
+        0.76082885,  0.76650225,  0.77215106,  0.77777883,  0.78337977];
+<span class="keyword">end</span>
+
+<span class="comment">% Calculation of Electric Field</span>
+ Disp_Electric_Field = -(Extra_electron*1.6*10^-19)/(2*3.84*3.84*10^-20);
+ Electric_Field_oxide = Disp_Electric_Field/(3.9 *8.854 * 10^-12);
+ Potential_Drop       = Electric_Field_oxide*10^-9;
+ Surface_Bias         = Gate_Bias - Potential_Drop;
+
+<span class="comment">% Schrodinger-Poisson Solve1r uses Gate Bias Directly</span>
+Vg = Gate_Bias;
+
+<span class="comment">% Schrodinger-Poisson Solver</span>
+
+<span class="keyword">for</span> counter1 = 1:length(Vg)
+<span class="comment">% Bias Condition</span>
+OutGenerate.surface_potential =  Vg(counter1);
+<span class="keyword">break</span>;
+<span class="keyword">if</span> ( OutGenerate.control.Solvers.SP || OutGenerate.control.Solvers.P )
+    <span class="keyword">for</span> i = 1:size(OutGenerate.surface.bias,2)
+        <span class="keyword">try</span>
+
+             scs(H,OutGenerate,OutGenerate.surface.bias{i});
+<span class="comment">%             scs_new(H,OutGenerate,OutGenerate.surface.bias{i});</span>
+
+        <span class="keyword">catch</span> err
+            idSegLast = regexp(err.identifier, <span class="string">'(?&lt;=:)\w+$'</span>, <span class="string">'match'</span>);
+            <span class="keyword">if</span>  strcmp(idSegLast,<span class="string">'ConvergenceFailed'</span>)
+                fprintf(<span class="string">'\n'</span>); fprintf(err.message); fprintf(<span class="string">'\n\n'</span>);
+                <span class="keyword">return</span>
+            <span class="keyword">else</span>
+                rethrow(err);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+output_dir  = OutGenerate.control.Output_directory;
+file_prefix = OutGenerate.control.file_prefix;
+
+fprintf(<span class="string">'\nSaving the results in:\n %s \n'</span>,output_dir);
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Density-Gradient Optimization Solver</span>
+
+input_file_DG = files_DG{fileloop};
+OutGenerate=generate(input_file_DG);
+
+
+
+<span class="comment">% Density-Gradient Solver</span>
+<span class="keyword">if</span> choice == 0
+
+    <span class="comment">% Pre-Initialisation</span>
+    SP_Extra_electron = ones(1,length(Vg));
+    DG_Extra_electron = ones(1,length(Vg));
+    fitting_factor_final = ones(1,length(Vg));
+
+    <span class="keyword">for</span> counter1 = 1:length(Vg)
+
+    <span class="comment">% Processing the Schrodinger Poisson Files</span>
+    SP = open([<span class="string">'output/trial/dev1_sp/mat_files/file_'</span> num2str(Vg(counter1)) <span class="string">'.mat'</span>]);
+
+    <span class="comment">% Using MATLAB Trapezoidal Function to calculate Extra Electron from</span>
+    <span class="comment">% Schrodinger-Poisson Calculations</span>
+    SP_Extra_electron(counter1) = trapz(SP.OutGenerate.x, SP.p_charge - <span class="keyword">...</span>
+    SP.n_charge)*(0.0529)*(10^-7)* (1/((5.29*10^-9)^3))*(3.84*3.84*10^-16);
+
+    <span class="comment">% Density-Gradient Scheme for finding Optimized Fitting Factor</span>
+
+        <span class="comment">% Calculating Initial Solution(Poisson) for Density-Gradient Scheme</span>
+        Vg = Surface_Bias;
+        OutGenerate.surface_potential =  Vg(counter1);
+        [Vbetterguess, A]   = DG_initial(OutGenerate);
+
+
+        <span class="comment">% Optimization Scheme to find Fitting Factor</span>
+        fitting_factor_initial = 1;
+        lb=0;
+        ub=100;
+        options.TolFun=1e-10;
+        options.TolX=1e-25;
+        options.MaxIter=500;
+        options.MaxFunEvals=2000;
+        fitting_factor_final(counter1) = lsqnonlin(@abinitio_fitting2,fitting_factor_initial,lb,ub,options,OutGenerate,Extra_electron(counter1),Vbetterguess,A);
+        fprintf(<span class="string">'DG fitting parameter = %f'</span>,fitting_factor_final);
+
+        <span class="comment">% Processing Density-Gradient files</span>
+        DG = open([<span class="string">'output/trial/dev1_sp/mat_files/file_'</span> num2str(Vg(counter1)) <span class="string">'_DG.mat'</span>]);
+        <span class="comment">% Using MATLAB Trapezoidal Function to calculate Extra Electron from</span>
+        <span class="comment">% Density-Gradient Calculations</span>
+        DG_Extra_electron(counter1) = trapz(DG.x, DG.p_charge_DG - <span class="keyword">...</span>
+        DG.n_charge_DG)*(0.0529)*(10^-7)* (1/((5.29*10^-9)^3))*(3.84*3.84*10^-16);
+    <span class="keyword">end</span>
+
+
+
+<span class="comment">% Plotting Extra Electro vs. Gate Bias for various methods</span>
+
+<span class="comment">% Ab-intio plot</span>
+figure(1);
+plot(Gate_Bias,Extra_electron,<span class="string">'o'</span>);
+hold <span class="string">on</span>;
+
+<span class="comment">% Schrodinger-Poisson plot</span>
+figure(1);
+plot(Gate_Bias,SP_Extra_electron,<span class="string">'--'</span>);
+hold <span class="string">on</span>;
+
+<span class="comment">% Density-Gradient plot</span>
+figure(1);
+plot(Gate_Bias,DG_Extra_electron,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2);
+hold <span class="string">on</span>;
+
+<span class="comment">% Figure 1 Specifications</span>
+figure(1);
+xlabel(<span class="string">'Gate Bias(V)'</span>,<span class="string">'FontSize'</span>, 20);
+ylabel(<span class="string">'Extra electron(number)'</span>,<span class="string">'FontSize'</span>, 20);
+legend(<span class="string">'Ab-initio'</span>,<span class="string">'Eff-mass Schrodinger-Poisson'</span>,<span class="string">'Density-Gradient'</span>);
+title(<span class="string">'Plot of Extra electron vs. Gate Bias for different methods'</span>,<span class="string">'FontSize'</span>, 20);
+hold <span class="string">on</span>;
+
+<span class="comment">% Plotting Variation of Fitting Factor vs. Applied Gate Bias</span>
+figure(2)
+plot(Gate_Bias,fitting_factor_final,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2);
+hold <span class="string">on</span>;
+plot(Gate_Bias,fitting_factor_final,<span class="string">'o'</span>);
+xlabel(<span class="string">'Gate Bias(V)'</span>,<span class="string">'FontSize'</span>, 20);
+ylabel(<span class="string">'DG Fitting Factor'</span>,<span class="string">'FontSize'</span>, 20);
+legend(<span class="string">'3.2nm'</span>,<span class="string">'3.9nm'</span>,<span class="string">'5.4nm'</span>,<span class="string">'8.7nm'</span>,<span class="string">'10.3nm'</span>);
+title(<span class="string">'Plot of Variation of Density-Gradient Fitting Factor with Applied Gate Voltage'</span>,<span class="string">'FontSize'</span>, 20);
+
+<span class="comment">% Error Calculations</span>
+
+  <span class="comment">% Error between Schrodinger-Poisson and Ab-initio calculations</span>
+      Error_Ab_SP = Extra_electron - SP_Extra_electron;
+  <span class="comment">% Error between Ab-initio and Density-Gradient calculations</span>
+      Error_Ab_DG = Extra_electron - DG_Extra_electron;
+
+<span class="comment">% Plot of Error between Various Methods</span>
+figure(3)
+plot(Gate_Bias,Error_Ab_SP,<span class="string">'--'</span>,<span class="string">'LineWidth'</span>,2);
+plot(Gate_Bias,Error_Ab_DG,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2);
+xlabel(<span class="string">'Gate Bias(V)'</span>,<span class="string">'FontSize'</span>, 20);
+ylabel(<span class="string">'Error electron (number)'</span>,<span class="string">'FontSize'</span>, 20);
+legend(<span class="string">'8.7 nm'</span> , <span class="string">'5.4 nm'</span> , <span class="string">'3.2 nm'</span> , <span class="string">'3.9 nm'</span> , <span class="string">'10.3 nm'</span>);
+hold <span class="string">on</span>;
+
+<span class="keyword">elseif</span> choice == 1
+  fitting_factor_final = linspace(0 , 9 , 10 );
+  Vg = Surface_Bias;
+  <span class="keyword">for</span> counter2 = 1:length(fitting_factor_final)
+      <span class="keyword">for</span> counter1 = 1:length(Extra_electron)
+          <span class="comment">% Running the Density Gradient Algorithm</span>
+          OutGenerate.surface_potential =  Vg(counter1);
+          [Vbetterguess, A]   = DG_initial(OutGenerate);
+          [~] = scsdg(fitting_factor_final(counter2),OutGenerate,Vbetterguess,A);
+
+          <span class="comment">% Opening the Density Gradient File</span>
+          DG = open([<span class="string">'output/trial/dev1_sp/mat_files/file_'</span> num2str(Vg(counter1)) <span class="string">'_DG.mat'</span>]);
+
+          <span class="comment">% Calculaing P charge integral using simpsons rule</span>
+          <span class="comment">% Using MATLAB Trapezoidal Function to calculate Extra Electron from</span>
+          <span class="comment">% Density-Gradient Calculations</span>
+          DG_Extra_electron(counter1) = trapz(DG.x, DG.p_charge_DG - <span class="keyword">...</span>
+          DG.n_charge_DG)*(0.0529)*(10^-7)* (1/((5.29*10^-9)^3))*(3.84*3.84*10^-16);
+      <span class="keyword">end</span>
+
+      <span class="comment">% Plotting</span>
+      figure(1);
+      plot(Gate_Bias,DG_Extra_electron,<span class="string">'-'</span>,<span class="string">'LineWidth'</span>,2);
+      hold <span class="string">on</span>;
+
+      <span class="comment">% Ab-intio plot</span>
+        figure(1);
+        plot(Gate_Bias,Extra_electron,<span class="string">'o'</span>);
+        hold <span class="string">on</span>;
+
+  <span class="keyword">end</span>
+
+  <span class="comment">% Plot Specifications</span>
+  figure(1);
+  xlabel(<span class="string">'Gate Bias(V)'</span>);
+  ylabel(<span class="string">'Extra electron (number)'</span>);
+  legend(<span class="string">'ab-initio'</span>,<span class="string">'fitting factor = 0'</span>,<span class="string">'fitting factor = 1'</span>, <span class="string">'fitting factor = 2'</span>, <span class="string">'fitting factor = 3'</span>, <span class="string">'fitting factor = 4'</span>, <span class="string">'fitting factor = 5'</span>, <span class="string">'fitting factor = 6'</span>, <span class="string">'fitting factor = 7'</span>, <span class="string">'fitting factor = 8'</span> ,<span class="string">'fitting factor = 9'</span> ,<span class="string">'Location'</span>,<span class="string">'SouthWest'</span>    );
+  title(<span class="string">'Plot of Extra Electron vs. Gate Bias for different methods'</span>);
+
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+
+
+
+
+
+
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Reading the input file...   
+ var_surface.barrierDone  
+
+Generating the variables...    
+Obtaining bands in equilibrium 
+(also considering Phi_ms=0 for this analysis)
+Iteration = 1 	 Bias = equilibrium 	 Error in V = 1.485020e-18 
+Converged after 1 iterations 
+
+Saving results of equlibrium analysis in output/trial/dev1_sp/mat_files/Equilibrium/file__equilibrium.mat 
+Done 
+
+Reading the input file...   
+ var_surface.barrierDone  
+
+Generating the variables...    
+Obtaining bands in equilibrium 
+(also considering Phi_ms=0 for this analysis)
+Iteration = 1 	 Bias = equilibrium 	 Error in V = 2.587713e-19 
+Converged after 1 iterations 
+
+Saving results of equlibrium analysis in output/trial/dev1_sp/mat_files/Equilibrium/file__equilibrium.mat 
+Done 
+
+</pre><pre class="codeoutput error">Undefined function or variable 'choice'.
+
+Error in single_bias_abinitio (line 196)
+if choice == 0
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function single_bias_abinitio()
+
+% All Input Files of Different Widths
+files_SP = {'stack_files/SP/3_2nm.txt' , 'stack_files/SP/3_9nm.txt' ,... 
+    'stack_files/SP/5_4nm.txt' , 'stack_files/SP/8_7nm.txt' ,...
+    'stack_files/SP/10_3nm.txt' };
+files_DG = {'stack_files/DG/3_2nm.txt' , 'stack_files/DG/3_9nm.txt' ,... 
+    'stack_files/DG/5_4nm.txt' , 'stack_files/DG/8_7nm.txt' ,...
+    'stack_files/DG/10_3nm.txt' };
+
+for fileloop = 1:length(files_SP)-1
+    
+    % Selection of n-type(n) or p-type(p) simulation
+    Simulation_type = 'n';
+    
+    % Selection of Simulation Procedure
+    % Optimization of Fitting Factors to Ab-initio data(optimization)
+    % Sweep of Fitting factor over various values(sweep)
+    Simulation_procedure = 'optimization';
+    
+    % Processing of Input File for Schrodinger-Poisson solver
+    input_file_SP = files_SP{fileloop};
+    OutGenerate=generate(input_file_SP);    
+
+    % Selection of Appropriate 
+    % 1 for 3.2 nm
+    % 2 for 3.9 nm
+    % 3 for 5.4 nm
+    % 4 for 8.7 nm    
+    % 5 for 10.3 nm
+    wchoice = fileloop;
+    
+    H=getH(OutGenerate);
+    H=sparse(H);
+
+if wchoice == 4
+% Ab-initio data for 8.7 nm fin width
+Extra_electron = [-0, -0.00020408, -0.00040816, -0.00061224, -0.00081633,....
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,....
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,...
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,...
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,...
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,...
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,...
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,...
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,...
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01     ];
+Gate_Bias = [0   ,  0.42212308,  0.44607946,  0.46255743,  0.47595953,...
+        0.48765822,  0.49826737,  0.50811615,  0.5173989 ,  0.52624297,...
+        0.53473513,  0.5429375 ,  0.55089615,  0.55864624,  0.56621529,...
+        0.57362521,  0.58089533,  0.58803734,  0.595065  ,  0.6019887 ,...
+        0.6088173 ,  0.61555846,  0.62221998,  0.62880525,  0.63532063,...
+        0.64177207,  0.64816184,  0.65449354,  0.66077104,  0.66699734,...
+        0.67317528,  0.67930715,  0.68539533,  0.69144191,  0.69744886,...
+        0.70341794,  0.70935083,  0.71524906,  0.72111408,  0.72694725,...
+        0.73274979,  0.73852292,  0.74426772,  0.74998524,  0.75567646,...
+        0.76134231,  0.76698366,  0.77260134,  0.77819613,  0.78376877];
+elseif wchoice == 3
+% Data for 5.46 nm device fin width
+Extra_electron = [-0 , -0.00020408, -0.00040816, -0.00061224, -0.00081633,... 
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,...
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,...
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,...
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,...
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,...
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,...
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,...
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,...
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01      ];
+Gate_Bias = [0.        ,  0.44933436,  0.47257258,  0.4883634 ,  0.5010991 ,...
+        0.5121562 ,  0.52214786,  0.53140517,  0.54011577,  0.54840932,...
+        0.5563719 ,  0.5640628 ,  0.57153152,  0.57881053,  0.5859266 ,...
+        0.59290101,  0.59975093,  0.6064904 ,  0.6131311 ,  0.6196828 ,...
+        0.62615379,  0.63255117,  0.63888159,  0.64514928,  0.65135941,...
+        0.65751605,  0.66362283,  0.66968298,  0.67569935,  0.68167453,...
+        0.68761085,  0.69351043,  0.69937516,  0.7052068 ,  0.71100695,...
+        0.71677663,  0.72251815,  0.72823211,  0.73391979,  0.73958226,...
+        0.7452205 ,  0.75083545,  0.75642763,  0.76199875,  0.76754836,...
+        0.77307821,  0.77858859,  0.78408011,  0.78955337,  0.79500894];
+elseif wchoice == 1    
+% Data for 3.2 nm device fin width
+Extra_electron = [-0        , -0.00020408, -0.00040816, -0.00061224, -0.00081633,...
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,...
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,...
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,...
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,...
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,...
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,...
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,...
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,...
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01];
+Gate_Bias = [0.        ,  0.48374189,  0.50645215,  0.52172187,  0.53394579,...
+        0.54450006,  0.55399781,  0.5627661 ,  0.57100015,  0.57882589,...
+        0.5863293 ,  0.5935745 ,  0.60060139,  0.60744706,  0.61413807,...
+        0.62069256,  0.6271357 ,  0.63347464,  0.6397224 ,  0.64588923,...
+        0.65198315,  0.65801115,  0.66397925,  0.66989268,  0.67575598,...
+        0.68157314,  0.68734768,  0.69308273,  0.69878106,  0.70444517,...
+        0.71007729,  0.71567942,  0.7212534 ,  0.72680087,  0.73232334,...
+        0.73782219,  0.74329866,  0.74875391,  0.754189  ,  0.75960491,...
+        0.76500254,  0.77038271,  0.77574622,  0.78109377,  0.78642604,...
+        0.79174363,  0.79704715,  0.80233713,  0.80761407,  0.81287846];
+elseif wchoice == 2   
+% Data for 3.9 nm device fin width
+Extra_electron = [-0, -0.00020408, -0.00040816, -0.00061224, -0.00081633,...
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,...
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,...
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,...
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,...
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,...
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,...
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,...
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,...
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01  ];
+Gate_Bias = [0,  0.47377065,  0.4966183 ,  0.51202585,  0.52438554,...
+        0.53507386,  0.54470391,  0.55360277,  0.56196564,  0.56991844,...
+        0.57754713,  0.58491305,  0.59206145,  0.59902673,  0.6058356 ,...
+        0.61250924,  0.61906674,  0.62551796,  0.63187657,  0.63815258,...
+        0.64435356,  0.65048682,  0.65655812,  0.66257344,  0.66853656,...
+        0.67445171,  0.68032241,  0.68615178,  0.69194239,  0.69769678,...
+        0.7034177 ,  0.7091068 ,  0.71476594,  0.72039673,  0.72600069,...
+        0.73157919,  0.73713402,  0.74266526,  0.74817452,  0.75366228,...
+        0.75913048,  0.76457938,  0.77000978,  0.77542242,  0.78081798,...
+        0.78619707,  0.79156029,  0.79690819,  0.80224127,  0.80756004];
+elseif wchoice == 5    
+% Data for 10.3 nm device fin width
+Extra_electron = [-0, -0.00020408, -0.00040816, -0.00061224, -0.00081633,...
+       -0.00102041, -0.00122449, -0.00142857, -0.00163265, -0.00183673,...
+       -0.00204082, -0.0022449 , -0.00244898, -0.00265306, -0.00285714,...
+       -0.00306122, -0.00326531, -0.00346939, -0.00367347, -0.00387755,...
+       -0.00408163, -0.00428571, -0.0044898 , -0.00469388, -0.00489796,...
+       -0.00510204, -0.00530612, -0.0055102 , -0.00571429, -0.00591837,...
+       -0.00612245, -0.00632653, -0.00653061, -0.00673469, -0.00693878,...
+       -0.00714286, -0.00734694, -0.00755102, -0.0077551 , -0.00795918,...
+       -0.00816327, -0.00836735, -0.00857143, -0.00877551, -0.00897959,...
+       -0.00918367, -0.00938776, -0.00959184, -0.00979592, -0.01 ];
+Gate_Bias = [0,  0.41619826,  0.44048321,  0.45727504,  0.47096818,....
+        0.48294097,  0.49380834,  0.50390104,  0.51341307,  0.52247307,...
+        0.5311686 ,  0.53956254,  0.54770167,  0.55562186,  0.56335936,...
+        0.57091603,  0.57832723,  0.58560369,  0.59275826,  0.59980181,...
+        0.60674939,  0.61359201,  0.62035398,  0.62703555,  0.63364227,...
+        0.64017891,  0.64665301,  0.6530625 ,  0.65941392,  0.6657105 ,...
+        0.67195519,  0.67815068,  0.68429947,  0.69040383,  0.69646588,...
+        0.70248757,  0.7084707 ,  0.71441698,  0.72032796,  0.72620511,...
+        0.73204981,  0.73786334,  0.74364691,  0.74940165,  0.75512863,...
+        0.76082885,  0.76650225,  0.77215106,  0.77777883,  0.78337977];
+end
+
+% Calculation of Electric Field
+ Disp_Electric_Field = -(Extra_electron*1.6*10^-19)/(2*3.84*3.84*10^-20);
+ Electric_Field_oxide = Disp_Electric_Field/(3.9 *8.854 * 10^-12);
+ Potential_Drop       = Electric_Field_oxide*10^-9;
+ Surface_Bias         = Gate_Bias - Potential_Drop;
+
+% Schrodinger-Poisson Solve1r uses Gate Bias Directly
+Vg = Gate_Bias;
+
+% Schrodinger-Poisson Solver
+
+for counter1 = 1:length(Vg)
+% Bias Condition
+OutGenerate.surface_potential =  Vg(counter1);
+break;
+if ( OutGenerate.control.Solvers.SP || OutGenerate.control.Solvers.P )
+    for i = 1:size(OutGenerate.surface.bias,2)
+        try
+            
+             scs(H,OutGenerate,OutGenerate.surface.bias{i}); 
+%             scs_new(H,OutGenerate,OutGenerate.surface.bias{i});            
+            
+        catch err
+            idSegLast = regexp(err.identifier, '(?<=:)\w+$', 'match');
+            if  strcmp(idSegLast,'ConvergenceFailed')
+                fprintf('\n'); fprintf(err.message); fprintf('\n\n');
+                return
+            else
+                rethrow(err);
+            end
+        end
+    end
+
+output_dir  = OutGenerate.control.Output_directory; 
+file_prefix = OutGenerate.control.file_prefix;
+
+fprintf('\nSaving the results in:\n %s \n',output_dir);
+end
+end  
+
+% Density-Gradient Optimization Solver
+
+input_file_DG = files_DG{fileloop};
+OutGenerate=generate(input_file_DG);
+
+
+
+% Density-Gradient Solver
+if choice == 0
+    
+    % Pre-Initialisation
+    SP_Extra_electron = ones(1,length(Vg));
+    DG_Extra_electron = ones(1,length(Vg));
+    fitting_factor_final = ones(1,length(Vg));
+    
+    for counter1 = 1:length(Vg)   
+
+    % Processing the Schrodinger Poisson Files
+    SP = open(['output/trial/dev1_sp/mat_files/file_' num2str(Vg(counter1)) '.mat']);
+
+    % Using MATLAB Trapezoidal Function to calculate Extra Electron from
+    % Schrodinger-Poisson Calculations
+    SP_Extra_electron(counter1) = trapz(SP.OutGenerate.x, SP.p_charge - ... 
+    SP.n_charge)*(0.0529)*(10^-7)* (1/((5.29*10^-9)^3))*(3.84*3.84*10^-16); 
+
+    % Density-Gradient Scheme for finding Optimized Fitting Factor
+
+        % Calculating Initial Solution(Poisson) for Density-Gradient Scheme
+        Vg = Surface_Bias;
+        OutGenerate.surface_potential =  Vg(counter1);
+        [Vbetterguess, A]   = DG_initial(OutGenerate);       
+
+
+        % Optimization Scheme to find Fitting Factor
+        fitting_factor_initial = 1;
+        lb=0;
+        ub=100;
+        options.TolFun=1e-10;
+        options.TolX=1e-25;
+        options.MaxIter=500;
+        options.MaxFunEvals=2000;
+        fitting_factor_final(counter1) = lsqnonlin(@abinitio_fitting2,fitting_factor_initial,lb,ub,options,OutGenerate,Extra_electron(counter1),Vbetterguess,A);
+        fprintf('DG fitting parameter = %f',fitting_factor_final); 
+
+        % Processing Density-Gradient files
+        DG = open(['output/trial/dev1_sp/mat_files/file_' num2str(Vg(counter1)) '_DG.mat']);
+        % Using MATLAB Trapezoidal Function to calculate Extra Electron from
+        % Density-Gradient Calculations
+        DG_Extra_electron(counter1) = trapz(DG.x, DG.p_charge_DG - ... 
+        DG.n_charge_DG)*(0.0529)*(10^-7)* (1/((5.29*10^-9)^3))*(3.84*3.84*10^-16);  
+    end
+    
+
+
+% Plotting Extra Electro vs. Gate Bias for various methods
+
+% Ab-intio plot
+figure(1);
+plot(Gate_Bias,Extra_electron,'o');
+hold on;
+
+% Schrodinger-Poisson plot
+figure(1);
+plot(Gate_Bias,SP_Extra_electron,'REPLACE_WITH_DASH_DASH');
+hold on;
+
+% Density-Gradient plot
+figure(1);
+plot(Gate_Bias,DG_Extra_electron,'-','LineWidth',2);
+hold on;
+
+% Figure 1 Specifications
+figure(1);  
+xlabel('Gate Bias(V)','FontSize', 20);
+ylabel('Extra electron(number)','FontSize', 20);
+legend('Ab-initio','Eff-mass Schrodinger-Poisson','Density-Gradient');
+title('Plot of Extra electron vs. Gate Bias for different methods','FontSize', 20);
+hold on;
+
+% Plotting Variation of Fitting Factor vs. Applied Gate Bias
+figure(2)
+plot(Gate_Bias,fitting_factor_final,'-','LineWidth',2);
+hold on;
+plot(Gate_Bias,fitting_factor_final,'o');
+xlabel('Gate Bias(V)','FontSize', 20);
+ylabel('DG Fitting Factor','FontSize', 20);
+legend('3.2nm','3.9nm','5.4nm','8.7nm','10.3nm');
+title('Plot of Variation of Density-Gradient Fitting Factor with Applied Gate Voltage','FontSize', 20);
+
+% Error Calculations
+
+  % Error between Schrodinger-Poisson and Ab-initio calculations
+      Error_Ab_SP = Extra_electron - SP_Extra_electron;
+  % Error between Ab-initio and Density-Gradient calculations
+      Error_Ab_DG = Extra_electron - DG_Extra_electron;
+      
+% Plot of Error between Various Methods
+figure(3)
+plot(Gate_Bias,Error_Ab_SP,'REPLACE_WITH_DASH_DASH','LineWidth',2);
+plot(Gate_Bias,Error_Ab_DG,'-','LineWidth',2);
+xlabel('Gate Bias(V)','FontSize', 20);
+ylabel('Error electron (number)','FontSize', 20);
+legend('8.7 nm' , '5.4 nm' , '3.2 nm' , '3.9 nm' , '10.3 nm');
+hold on;
+
+elseif choice == 1
+  fitting_factor_final = linspace(0 , 9 , 10 );
+  Vg = Surface_Bias;
+  for counter2 = 1:length(fitting_factor_final)
+      for counter1 = 1:length(Extra_electron)
+          % Running the Density Gradient Algorithm
+          OutGenerate.surface_potential =  Vg(counter1);
+          [Vbetterguess, A]   = DG_initial(OutGenerate);              
+          [~] = scsdg(fitting_factor_final(counter2),OutGenerate,Vbetterguess,A);
+
+          % Opening the Density Gradient File
+          DG = open(['output/trial/dev1_sp/mat_files/file_' num2str(Vg(counter1)) '_DG.mat']);
+
+          % Calculaing P charge integral using simpsons rule              
+          % Using MATLAB Trapezoidal Function to calculate Extra Electron from
+          % Density-Gradient Calculations
+          DG_Extra_electron(counter1) = trapz(DG.x, DG.p_charge_DG - ... 
+          DG.n_charge_DG)*(0.0529)*(10^-7)* (1/((5.29*10^-9)^3))*(3.84*3.84*10^-16); 
+      end
+
+      % Plotting          
+      figure(1);
+      plot(Gate_Bias,DG_Extra_electron,'-','LineWidth',2);
+      hold on;
+      
+      % Ab-intio plot
+        figure(1);
+        plot(Gate_Bias,Extra_electron,'o');
+        hold on;
+
+  end
+
+  % Plot Specifications  
+  figure(1);
+  xlabel('Gate Bias(V)');
+  ylabel('Extra electron (number)');
+  legend('ab-initio','fitting factor = 0','fitting factor = 1', 'fitting factor = 2', 'fitting factor = 3', 'fitting factor = 4', 'fitting factor = 5', 'fitting factor = 6', 'fitting factor = 7', 'fitting factor = 8' ,'fitting factor = 9' ,'Location','SouthWest'    );
+  title('Plot of Extra Electron vs. Gate Bias for different methods');
+
+end
+end
+
+
+      
+
+
+
+end
+
+
+##### SOURCE END #####
+--></body></html>

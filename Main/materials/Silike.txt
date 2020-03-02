@@ -1,0 +1,5 @@
+name           SiO2
+Eg             9.0
+epsilon        11.9
+
+

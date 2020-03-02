@@ -1,0 +1,327 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>PARSER_MATERIAL</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-09-17"><meta name="DC.source" content="parser_material.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>PARSER_MATERIAL</h1><!--introduction--><p>parses material properties</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">function: parser_material</a></li><li><a href="#3">ClassMaterial</a></li><li><a href="#4">TODO: which properties are compulsory?</a></li></ul></div><h2>function: parser_material<a name="1"></a></h2><pre>Input: material file
+Output: ClassMaterial; used in OutParser.layer
+Called by:
+&lt;html&gt;
+&lt;a href= "parser_layer.html" &gt;  parser_layer &lt;/a&gt;
+&lt;/html&gt;</pre><pre class="codeinput"><span class="keyword">function</span> var_material = parser_material(filename, WORK_DIR )
+</pre><pre class="codeinput">     <span class="comment">% Materials folder in default_path (stored in WORK_DIR)</span>
+     pathname = [ WORK_DIR <span class="string">'/materials/'</span>];
+
+     fid = fopen([pathname filename]);
+       D = textscan(fid,<span class="string">'%s'</span>,<span class="string">'commentStyle'</span>, <span class="string">'//'</span>);
+     fclose(fid);
+</pre><pre class="codeoutput">Error using parser_material (line 15)
+Not enough input arguments.
+</pre><h2>ClassMaterial<a name="3"></a></h2><pre class="codeinput">	 <span class="comment">% &lt;html&gt;</span>
+<span class="comment">% &lt;a href= "../../classes/html/ClassMaterial.html" &gt; ClassMaterial  &lt;/a&gt;</span>
+<span class="comment">% &lt;/html&gt;</span>
+</pre><h2>TODO: which properties are compulsory?<a name="4"></a></h2><pre class="codeinput">     var_material = ClassMaterial;
+     p = 1;
+     <span class="keyword">while</span> (p &lt;= length(D{:}))
+         <span class="keyword">switch</span> D{1}{p}
+		 <span class="comment">% Name</span>
+             <span class="keyword">case</span> <span class="string">'name'</span>
+                 p = p+1;
+                 var_material.name = D{1}{p};
+
+			 <span class="keyword">case</span> <span class="string">'Eg'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                    throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.Eg = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'mn'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.mn_eff = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'mn_t'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.mn_t = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'mn_l'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.mn_l = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'mp'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.mp_eff = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'mp_lh'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.mp_lh = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'mp_hh'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.mp_hh = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'epsilon'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.epsilon = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'Nc'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.Nc = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'Nv'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.Nv = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'E_affinity'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.E_affinity = str2double(D{1}{p});
+
+			 <span class="keyword">case</span> <span class="string">'eta_C'</span>
+                 p = p+1;
+                 <span class="keyword">if</span> (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 <span class="keyword">end</span>
+                 var_material.eta_C = str2double(D{1}{p});
+
+             <span class="keyword">otherwise</span>
+                  msgStr = <span class="string">'error: Unable to evaulate the command ''%s'' (in file ''%s'')'</span>;
+                  err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,D{1}{p},filename);
+                  throw(err);
+         <span class="keyword">end</span>
+         p = p+1;
+     <span class="keyword">end</span>
+
+	 <span class="comment">% Error format</span>
+    <span class="keyword">function</span> throwErr(value, property, filename)
+        msgStr = <span class="string">'error: Invalid value ''%s'' detected for property ''%s'' (in file ''%s'')'</span>;
+        err = MException(<span class="string">'MATLAB:InvalidValue'</span>,msgStr,value,property,filename);
+        throw(err);
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% PARSER_MATERIAL
+% parses material properties
+
+%%% function: parser_material
+%  Input: material file
+% Output: ClassMaterial; used in OutParser.layer 
+% Called by:
+% <html> 
+% <a href= "parser_layer.html" >  parser_layer </a> 
+% </html>
+
+function var_material = parser_material(filename, WORK_DIR )
+
+     % Materials folder in default_path (stored in WORK_DIR)
+     pathname = [ WORK_DIR '/materials/'];
+         
+     fid = fopen([pathname filename]);
+       D = textscan(fid,'%s','commentStyle', '//');
+     fclose(fid);
+     %% ClassMaterial
+	 % <html> 
+% <a href= "../../classes/html/ClassMaterial.html" > ClassMaterial  </a> 
+% </html>
+%% TODO: which properties are compulsory?
+     var_material = ClassMaterial;
+     p = 1;     
+     while (p <= length(D{:}))         
+         switch D{1}{p}
+		 % Name
+             case 'name'
+                 p = p+1;
+                 var_material.name = D{1}{p};
+             
+			 case 'Eg'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                    throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.Eg = str2double(D{1}{p});
+             
+			 case 'mn'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.mn_eff = str2double(D{1}{p});
+             
+			 case 'mn_t'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.mn_t = str2double(D{1}{p});                 
+             
+			 case 'mn_l'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.mn_l = str2double(D{1}{p});
+             
+			 case 'mp'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.mp_eff = str2double(D{1}{p});
+             
+			 case 'mp_lh'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.mp_lh = str2double(D{1}{p});                 
+             
+			 case 'mp_hh'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.mp_hh = str2double(D{1}{p});
+             
+			 case 'epsilon'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.epsilon = str2double(D{1}{p});
+             
+			 case 'Nc'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.Nc = str2double(D{1}{p});
+             
+			 case 'Nv'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.Nv = str2double(D{1}{p});
+             
+			 case 'E_affinity'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.E_affinity = str2double(D{1}{p});
+             
+			 case 'eta_C'
+                 p = p+1;
+                 if (isnan(str2double(D{1}{p})))
+                     throwErr(D{1}{p},D{1}{p-1},filename);
+                 end
+                 var_material.eta_C = str2double(D{1}{p});
+
+             otherwise
+                  msgStr = 'error: Unable to evaulate the command ''%s'' (in file ''%s'')';
+                  err = MException('MATLAB:InvalidCommand',msgStr,D{1}{p},filename);
+                  throw(err);
+         end
+         p = p+1;
+     end
+
+	 % Error format
+    function throwErr(value, property, filename)
+        msgStr = 'error: Invalid value ''%s'' detected for property ''%s'' (in file ''%s'')';
+        err = MException('MATLAB:InvalidValue',msgStr,value,property,filename);
+        throw(err);
+    end
+     
+end
+##### SOURCE END #####
+--></body></html>

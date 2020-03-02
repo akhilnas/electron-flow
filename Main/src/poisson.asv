@@ -1,0 +1,95 @@
+function V_out  = poisson(BC,x,rho,epsilon)
+
+% BC =  struct('B1','type','B2','type','B1_val',[],'B2_val',[]);
+%  type can be either both Dirichlet or one Dirichlet and one Neumann
+
+%global Q eps0 
+Q=sqrt(2);  %electronic charge
+eps0=1/(4*pi);  % vacuum permittivity 
+
+persistent H H_temp d1 eps1 IsFirst f
+
+No_of_nodes = length(x);
+
+if isempty(IsFirst)
+    IsFirst = 0;
+end
+
+if IsFirst == 0
+
+    size_of_matrix = No_of_nodes;
+    
+    H      = zeros(size_of_matrix+1,size_of_matrix);
+    f      = zeros(1,size_of_matrix+1);
+    Hdiag  = zeros(1,No_of_nodes-2);
+    Hupper = zeros(1,No_of_nodes-3);
+    Hlower = zeros(1,No_of_nodes-3);
+    d1     = [0 diff(x) 0]; d1(1)   = d1(2); d1(end) = d1(end-1);    
+    eps1   = [epsilon(1) epsilon epsilon(end)];
+    
+    for n=2:No_of_nodes+1
+        temp1 = eps1(n-1)/d1(n-1);
+        temp2 = eps1(n)/d1(n);
+        
+        Hdiag(n-1)=(2/(d1(n)+d1(n-1))) *(temp1+temp2);
+        
+        if n<=No_of_nodes
+            Hupper(n-1)=-(2/(d1(n)+d1(n-1)))*temp2;
+        end
+        
+        if n>=3
+            Hlower(n-2)=-(2/(d1(n)+d1(n-1)))*temp1;
+        end        
+    end
+    
+    H_temp = diag(Hdiag,0)+diag(Hupper,1)+diag(Hlower,-1);
+    
+end
+
+IsFirst = IsFirst + 1;
+
+H(1:end-1,:) = H_temp ;
+f(1:end-1)   = Q*rho/eps0;
+%--------------------------------------------------------------------------
+
+H(end-1,:) = zeros(1,size(H,2));
+
+if     ( strcmp(BC.B1,'Dirichlet') && strcmp(BC.B2,'Dirichlet') )
+    H(end-1,1) = 1;                       f(end-1) = BC.B1_val;
+    H(end,end) = 1;                       f(end)   = BC.B2_val;
+elseif ( strcmp(BC.B1,'Dirichlet') && strcmp(BC.B2,'Neumann'  ) )
+    H(end-1,end-1)= -1; H(end-1,end)= 1;  f(end-1) = 0;
+    H(end,1)=1;                           f(end)   = BC.B1_val;
+    % elseif ( strcmp(BC.B1,'Neumann'  ) && strcmp(BC.B2,'Dirichlet') )
+    %     H(end-1,1)=1; H(end-1,2)=-1;          f(end-1) = 0;
+    %     H(end,end)=1;                         f(end)   = BC.B2_val;
+end
+
+if any(isnan(f))
+        msgStr = 'error:Convergence failed';
+        err = MException('MATLAB:ConvergenceFailed',msgStr);
+        throw(err);        
+end
+
+V_out = (H(2:end,:)\f(2:end)')';
+
+%% Plotting
+
+DrawPlot = 0;
+PlotVoltage = 1;
+if(DrawPlot && PlotVoltage)
+    
+    subplot(3,2,4)
+    % x_metal=x(end):2:x(end)+50;
+    % x1=(  [x x_metal]-x(Oxide_nodes(1))  )*0.0529;
+    % V_metal=V_out(end)*ones(1,length(x_metal));
+    % hh=plot(x1,[V_out V_metal]*13.6);
+    
+    hh=plot(x*0.0529,V_out*13.6);
+    xlabel('x (nm)')
+    ylabel('V ( Volts)')
+    refreshdata(hh,'caller')
+    drawnow,pause(.001)
+end
+
+end

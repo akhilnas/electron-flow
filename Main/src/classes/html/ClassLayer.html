@@ -1,0 +1,183 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ClassLayer</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-09-17"><meta name="DC.source" content="ClassLayer.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">classdef</span> ClassLayer
+
+    <span class="keyword">properties</span>
+        layer_name
+        nodes
+        thickness
+        Pos_begin = 0
+        material
+        Delta_Ec = 0
+        Ec
+        temperature = 300
+        sublayers
+        grid_spacing = 0.1
+        Nd = 0
+        Na = 0
+        Nbt = 0
+
+        layer_material = ClassMaterial;
+    <span class="keyword">end</span>
+
+    <span class="keyword">properties</span>(Dependent = true)
+        Pos_end
+    <span class="keyword">end</span>
+
+    <span class="keyword">methods</span>
+
+        <span class="keyword">function</span> Pos_end = get.Pos_end(Obj)
+            Pos_end = Obj.Pos_begin + Obj.thickness;
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> r = CheckValues(Obj)
+            r = 0;
+            t_layer    = Obj.thickness;
+            t_sublayer = 0;
+            <span class="keyword">if</span> ~isempty(Obj.sublayers)
+                <span class="keyword">for</span> j = 1:length(Obj.sublayers)
+
+                    <span class="keyword">if</span> Obj.sublayers(j).Pos_begin &gt; t_layer
+                        msgStr = <span class="string">'error: ''start'' must be &lt; layer ''thickness'' (in layer ''%s'', sublayer ''%d'')'</span>;
+                        err    = MException(<span class="string">'MATLAB:ValueCheckError'</span>,msgStr,Obj.layer_name,j);
+                        throw(err);
+                    <span class="keyword">end</span>
+                    t_sublayer = t_sublayer + Obj.sublayers(j).thickness;
+                <span class="keyword">end</span>
+                <span class="keyword">if</span> t_layer &lt; t_sublayer
+                    msgStr = <span class="string">'error: Sum of the thicknesses of sublayers &gt; thickness of the layer (in layer ''%s'')'</span>;
+                    err    = MException(<span class="string">'MATLAB:ValueCheckError'</span>,msgStr,Obj.layer_name);
+                    throw(err);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            r = 1;
+        <span class="keyword">end</span>
+
+
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+classdef ClassLayer
+    
+    properties
+        layer_name
+        nodes
+        thickness
+        Pos_begin = 0
+        material
+        Delta_Ec = 0
+        Ec
+        temperature = 300
+        sublayers
+        grid_spacing = 0.1
+        Nd = 0
+        Na = 0
+        Nbt = 0
+        
+        layer_material = ClassMaterial;
+    end
+    
+    properties(Dependent = true)
+        Pos_end
+    end
+    
+    methods
+        
+        function Pos_end = get.Pos_end(Obj)
+            Pos_end = Obj.Pos_begin + Obj.thickness;
+        end
+        
+        function r = CheckValues(Obj)
+            r = 0;
+            t_layer    = Obj.thickness;
+            t_sublayer = 0;
+            if ~isempty(Obj.sublayers)
+                for j = 1:length(Obj.sublayers)
+                    
+                    if Obj.sublayers(j).Pos_begin > t_layer
+                        msgStr = 'error: ''start'' must be < layer ''thickness'' (in layer ''%s'', sublayer ''%d'')';
+                        err    = MException('MATLAB:ValueCheckError',msgStr,Obj.layer_name,j);
+                        throw(err);
+                    end
+                    t_sublayer = t_sublayer + Obj.sublayers(j).thickness;
+                end
+                if t_layer < t_sublayer
+                    msgStr = 'error: Sum of the thicknesses of sublayers > thickness of the layer (in layer ''%s'')';
+                    err    = MException('MATLAB:ValueCheckError',msgStr,Obj.layer_name);
+                    throw(err);
+                end
+            end
+            r = 1;
+        end
+                
+        
+    end
+    
+end
+##### SOURCE END #####
+--></body></html>

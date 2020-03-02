@@ -1,0 +1,263 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>PARSER</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-09-17"><meta name="DC.source" content="parser.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>PARSER</h1><!--introduction--><pre>Segments input file of ideal c-v
+Calls parsing functions of sections, layer, surface, substrate, controls</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">function: parser</a></li><li><a href="#3">Reading input file</a></li><li><a href="#4">Major sections of outparser: layer, surface, substrate, control (Initialising)</a></li><li><a href="#6">Outparser layer</a></li><li><a href="#9">Outparser surface</a></li><li><a href="#12">OutParser substrate</a></li><li><a href="#15">OutParser controls</a></li></ul></div><h2>function: parser<a name="1"></a></h2><pre>Input: input file
+Output: Outparser vector
+Called by:</pre><p>
+<a href= "../../html/generate.html" > "generate.m"  </a>
+</p><pre class="codeinput"><span class="keyword">function</span> OutParser = parser(filename,pathname,WORK_DIR)
+</pre><h2>Reading input file<a name="3"></a></h2><pre class="codeinput">fprintf(<span class="string">'Reading the input file...   \n '</span>)
+
+fid = fopen([pathname filename]);
+
+<span class="keyword">if</span> ~fid
+    err = MException(<span class="string">'MATLAB:InvalidFileFid'</span>,FileName);
+    throw(err);
+<span class="keyword">end</span>
+
+C = textscan(fid,<span class="string">'%s'</span>,<span class="string">'commentStyle'</span>, <span class="string">'//'</span>);
+LineNo = zeros(1,length(C{:}));
+
+frewind(fid);
+
+S = 1; E = 0; CurrentLine = 1;
+<span class="keyword">while</span> ~feof(fid)
+    aa = fgetl(fid);
+    <span class="keyword">if</span> ~isempty(aa)
+        temp  = textscan(aa,<span class="string">'%s'</span>,<span class="string">'commentStyle'</span>, <span class="string">'//'</span>);
+        E = S + length(temp{:});
+        LineNo(S:E) = CurrentLine;
+    <span class="keyword">end</span>
+    CurrentLine = CurrentLine + 1;
+    S = E;
+<span class="keyword">end</span>
+
+fclose(fid);
+</pre><pre class="codeoutput">Reading the input file...   
+ </pre><pre class="codeoutput">Error using parser (line 21)
+Not enough input arguments.
+</pre><h2>Major sections of outparser: layer, surface, substrate, control (Initialising)<a name="4"></a></h2><pre class="codeinput">OutParser.layer     = [];
+OutParser.surface   = [];
+OutParser.substrate = [];
+OutParser.control  = [];
+
+i = 1;
+CumThickness = 0;
+<span class="keyword">while</span> (i &lt;= length(C{:}))
+    <span class="keyword">switch</span> C{1}{i}
+        <span class="keyword">case</span> <span class="string">'&lt;#'</span>
+</pre><pre class="codeinput">            i = i + comment(C,i);
+</pre><h2>Outparser layer<a name="6"></a></h2><p>
+<a href= "parser_layer.html" > Refer parser_layer  </a>
+</p><pre class="codeinput">			<span class="keyword">case</span> <span class="string">'layer'</span>
+</pre><pre class="codeinput">            [layer,NoWords]     = parser_layer(C,i,LineNo,CumThickness,WORK_DIR);
+            i = i + NoWords;
+
+            OutParser.layer = [OutParser.layer layer];
+            CumThickness = CumThickness + layer.thickness;
+</pre><h2>Outparser surface<a name="9"></a></h2><p>
+<a href= "parser_surface.html" > Refer parser_surface  </a>
+</p><pre class="codeinput">		<span class="keyword">case</span> <span class="string">'surface'</span>
+</pre><pre class="codeinput">            [var_surface, NoWords]   = parser_surface(C,i,LineNo);
+             i = i + NoWords;
+             OutParser.surface = [OutParser.surface var_surface];
+</pre><h2>OutParser substrate<a name="12"></a></h2><p>
+<a href= "parser_substrate.html" > Refer parser_substrate  </a>
+</p><pre class="codeinput">		<span class="keyword">case</span> <span class="string">'substrate'</span>
+</pre><pre class="codeinput">            [var_substrate, NoWords] = parser_substrate(C,i,LineNo);
+            i = i + NoWords;
+            OutParser.substrate = [OutParser.substrate var_substrate];
+</pre><h2>OutParser controls<a name="15"></a></h2><p>
+<a href= "parser_controls.html" > Refer parser_controls  </a>
+</p><pre class="codeinput">		<span class="keyword">case</span> <span class="string">'Controls'</span>
+            [var_control, NoWords]  = parser_controls(C,i,LineNo);
+            i = i + NoWords;
+            OutParser.control = [OutParser.control var_control];
+        <span class="keyword">otherwise</span>
+            msgStr = <span class="string">'error: Unable to evaulate the command ''%s'' (input line No %d)'</span>;
+            err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,C{1}{i},LineNo(i));
+            throw(err);
+    <span class="keyword">end</span>
+    i = i+1;
+<span class="keyword">end</span>
+
+fprintf(<span class="string">'Done  \n\n'</span>)
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% PARSER
+%  Segments input file of ideal c-v
+% Calls parsing functions of sections, layer, surface, substrate, controls 
+
+%%% function: parser
+%  Input: input file
+% Output: Outparser vector
+% Called by: 
+%
+% <html> 
+% <a href= "../../html/generate.html" > "generate.m"  </a> 
+% </html>
+
+
+function OutParser = parser(filename,pathname,WORK_DIR)
+
+%% Reading input file
+
+fprintf('Reading the input file...   \n ')
+
+fid = fopen([pathname filename]);
+
+if ~fid
+    err = MException('MATLAB:InvalidFileFid',FileName);
+    throw(err);
+end
+
+C = textscan(fid,'%s','commentStyle', '//');
+LineNo = zeros(1,length(C{:}));
+
+frewind(fid);
+
+S = 1; E = 0; CurrentLine = 1;
+while ~feof(fid)
+    aa = fgetl(fid);
+    if ~isempty(aa)
+        temp  = textscan(aa,'%s','commentStyle', '//');
+        E = S + length(temp{:});
+        LineNo(S:E) = CurrentLine;
+    end
+    CurrentLine = CurrentLine + 1;
+    S = E;
+end
+
+fclose(fid);
+
+%% Major sections of outparser: layer, surface, substrate, control (Initialising)
+
+OutParser.layer     = [];
+OutParser.surface   = [];
+OutParser.substrate = [];
+OutParser.control  = [];
+
+i = 1;
+CumThickness = 0;
+while (i <= length(C{:}))
+    switch C{1}{i}
+        case '<#'            
+            i = i + comment(C,i);
+%% Outparser layer 
+% <html> 
+% <a href= "parser_layer.html" > Refer parser_layer  </a> 
+% </html>
+			case 'layer'
+            [layer,NoWords]     = parser_layer(C,i,LineNo,CumThickness,WORK_DIR);
+            i = i + NoWords;            
+
+            OutParser.layer = [OutParser.layer layer];
+            CumThickness = CumThickness + layer.thickness;
+%%  Outparser surface
+% <html> 
+% <a href= "parser_surface.html" > Refer parser_surface  </a> 
+% </html>
+		case 'surface'
+		
+            [var_surface, NoWords]   = parser_surface(C,i,LineNo);
+             i = i + NoWords;
+             OutParser.surface = [OutParser.surface var_surface];
+        
+%% OutParser substrate
+% <html> 
+% <a href= "parser_substrate.html" > Refer parser_substrate  </a> 
+% </html>
+		case 'substrate'
+            [var_substrate, NoWords] = parser_substrate(C,i,LineNo); 
+            i = i + NoWords;
+            OutParser.substrate = [OutParser.substrate var_substrate];
+%% OutParser controls
+% <html> 
+% <a href= "parser_controls.html" > Refer parser_controls  </a> 
+% </html>
+		case 'Controls'
+            [var_control, NoWords]  = parser_controls(C,i,LineNo);
+            i = i + NoWords;
+            OutParser.control = [OutParser.control var_control];
+        otherwise
+            msgStr = 'error: Unable to evaulate the command ''%s'' (input line No %d)';
+            err = MException('MATLAB:InvalidCommand',msgStr,C{1}{i},LineNo(i));
+            throw(err);
+    end
+    i = i+1;
+end
+
+fprintf('Done  \n\n')
+
+end
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>

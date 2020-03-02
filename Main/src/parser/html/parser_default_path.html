@@ -1,0 +1,170 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>DEFAULT PATH PARSER</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-09-17"><meta name="DC.source" content="parser_default_path.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>DEFAULT PATH PARSER</h1><!--introduction--><p>Parses default path in 1DPS_pref.txt</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Function: parser_default_path</a></li><li><a href="#4">Basic parsing, comment styles etc</a></li><li><a href="#5">Checks for 'default_path'</a></li></ul></div><h2>Function: parser_default_path<a name="2"></a></h2><pre>Input : no argument, but opens 1DPS_pref.txt
+Output: default_path</pre><pre class="codeinput"><span class="keyword">function</span> default_path = parser_default_path()
+</pre><pre class="codeinput">filename = <span class="string">'1DPS_pref.txt'</span>;
+
+
+fid = fopen(filename);
+<span class="keyword">if</span> fid &lt;= 0
+    msgStr = <span class="string">'error: Could not find the file ''%s'' '</span>;
+    err = MException(<span class="string">'MATLAB:InvalidFileFid'</span>,msgStr,filename);
+    throw(err);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Error using parser_default_path (line 17)
+error: Could not find the file '1DPS_pref.txt' 
+</pre><h2>Basic parsing, comment styles etc<a name="4"></a></h2><pre class="codeinput">C = textscan(fid,<span class="string">'%s'</span>,<span class="string">'CommentStyle'</span>,<span class="string">'#'</span>,<span class="string">'delimiter'</span>,<span class="string">'= '</span>,<span class="string">'MultipleDelimsAsOne'</span>,<span class="string">'1'</span>);
+fclose(fid);
+
+C = strtrim(C);
+
+i = 1;
+</pre><h2>Checks for 'default_path'<a name="5"></a></h2><pre class="codeinput"><span class="keyword">while</span> ~strcmp(C{1}{i},<span class="string">'default_path'</span>)
+    <span class="keyword">if</span> i == length(C{1})
+        msgStr = <span class="string">'error: Invalid command found in ''%s'''</span>;
+        err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,filename);
+        throw(err);
+    <span class="keyword">end</span>
+    i = i+1;
+<span class="keyword">end</span>
+i = i+1;
+<span class="comment">% checks if text exists, if</span>
+<span class="keyword">if</span> (length(C{1}) -i + 1) &gt; 1
+    msgStr = <span class="string">'error: Invalid command found in ''%s'''</span>;
+    err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,filename);
+    throw(err);
+
+
+<span class="keyword">else</span>
+    temp = textscan(C{1}{i},<span class="string">'%q'</span>);
+    default_path = temp{1}{1};
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> ~exist(default_path,<span class="string">'dir'</span>)
+    msgStr = <span class="string">'error: Could not find the folder ''%s'' '</span>;
+    err = MException(<span class="string">'MATLAB:FolderNotExist'</span>,msgStr,default_path);
+    throw(err);
+<span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% DEFAULT PATH PARSER
+% Parses default path in 1DPS_pref.txt
+
+%% 
+%%% Function: parser_default_path
+%  Input : no argument, but opens 1DPS_pref.txt
+% Output: default_path
+function default_path = parser_default_path()
+ 
+filename = '1DPS_pref.txt';
+
+
+fid = fopen(filename);
+if fid <= 0
+    msgStr = 'error: Could not find the file ''%s'' ';
+    err = MException('MATLAB:InvalidFileFid',msgStr,filename);
+    throw(err);
+end
+
+%% Basic parsing, comment styles etc
+C = textscan(fid,'%s','CommentStyle','#','delimiter','= ','MultipleDelimsAsOne','1');
+fclose(fid);
+
+C = strtrim(C);
+
+i = 1;
+%% Checks for 'default_path' 
+while ~strcmp(C{1}{i},'default_path')
+    if i == length(C{1})
+        msgStr = 'error: Invalid command found in ''%s''';
+        err = MException('MATLAB:InvalidCommand',msgStr,filename);
+        throw(err);
+    end
+    i = i+1;
+end
+i = i+1;
+% checks if text exists, if  
+if (length(C{1}) -i + 1) > 1
+    msgStr = 'error: Invalid command found in ''%s''';
+    err = MException('MATLAB:InvalidCommand',msgStr,filename);
+    throw(err);    
+
+     
+else
+    temp = textscan(C{1}{i},'%q');
+    default_path = temp{1}{1};
+end
+
+if ~exist(default_path,'dir')
+    msgStr = 'error: Could not find the folder ''%s'' ';
+    err = MException('MATLAB:FolderNotExist',msgStr,default_path);
+    throw(err);
+end
+
+end
+##### SOURCE END #####
+--></body></html>

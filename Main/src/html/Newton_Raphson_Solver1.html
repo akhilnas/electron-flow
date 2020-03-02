@@ -1,0 +1,314 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Newton_Raphson_Solver1</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-05-12"><meta name="DC.source" content="Newton_Raphson_Solver1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [ charge ] = Newton_Raphson_Solver1( fitting_factor,No_of_nodes,x,charge,Vt,Q,Vbetterguess,ni,n0,p0,Nc, indicator )
+<span class="comment">% Newton Raphson Solver for electron and hole density</span>
+
+  <span class="comment">% Initialisation of Variables</span>
+  <span class="comment">% Convergence factor for Inner Newton Raphson</span>
+    alpha       = 1;
+  <span class="comment">% Maximum Number of Iterations of Inner Newton-Raphson Loop for charge density</span>
+    MaxIter     = 1000;
+  <span class="comment">% Tolerence allowed in the charge density profile in the material</span>
+    Tolerence   = 1.0E-09;
+
+  <span class="comment">% Pre-allocation</span>
+    fndash         = zeros(No_of_nodes-2);
+    fn             = zeros(No_of_nodes-2,1);
+
+  <span class="comment">% Considering only the middle elements of charge</span>
+    sqrtdensity = charge(2:No_of_nodes-1).^0.5;
+    Nc          = Nc(2:No_of_nodes-1)';
+
+  <span class="comment">% Values of Constants</span>
+    bn=fitting_factor/(12*1.08*Vt);            <span class="comment">%bn calculation</span>
+    bp=fitting_factor/(12*0.57*Vt);            <span class="comment">%bp calculation</span>
+   <span class="comment">% phin=((Vt*log(ni/n0)));</span>
+   <span class="comment">% phip=((Vt*log(p0/ni)));</span>
+    phin = Vt*log((sqrtdensity.^2)./Nc);
+
+  <span class="comment">% Electron and hole density boundary conditions</span>
+    ninit = 0;
+    nend  = 0;
+    pinit = 0;
+    pend  = 0;
+
+  <span class="comment">% Selecting the Constants depending on the sign of chrage Density that we want to solve for</span>
+  <span class="keyword">if</span> indicator == 1
+         b   = bp;
+         phi = phip;
+         init= pinit;
+         last= pend;
+
+  <span class="keyword">elseif</span> indicator == -1
+         b   = bn;
+         phi = phin;
+         init= ninit;
+         last= nend;
+  <span class="keyword">end</span>
+
+  <span class="comment">% The Loop solves the Density Gradient Equation for electron and hole density</span>
+  iteration = 1;  <span class="comment">% Keeps track of the Number of Iterations of the Inner Newton Raphson Loop</span>
+
+  <span class="keyword">while</span> true
+      fprintf(<span class="string">'\n Newton Raphson Loop Iteration: \n'</span>);
+      disp(iteration);
+
+      <span class="comment">% Updating phi values</span>
+         phi = Vt*log((sqrtdensity.^2)./Nc);
+
+      <span class="comment">% Calculation of the electron and hole density equations</span>
+      <span class="keyword">for</span> counter1=1:No_of_nodes-2
+          <span class="keyword">if</span> counter1==1
+              fn(counter1,1)=((b/((x(1,2)-x(1,1))^2))*((sqrtdensity(counter1+1,1))-2*(sqrtdensity(counter1,1))+(init)))+(((sqrtdensity(counter1,1))/2)*(Vbetterguess(1,counter1+1)+((indicator)*((1/Q)*Vt*log((sqrtdensity(counter1,1)^2)/ni(1,counter1+1))))-phi(counter1,1)));
+          <span class="keyword">elseif</span> counter1==(No_of_nodes-2)
+              fn(counter1,1)=((b/((x(1,No_of_nodes-1)-x(1,No_of_nodes-2))^2))*((last)-2*(sqrtdensity(counter1,1))+(sqrtdensity(counter1-1,1))))+(((sqrtdensity(counter1,1))/2)*(Vbetterguess(1,counter1+1)+((indicator)*((1/Q)*Vt*log((sqrtdensity(counter1,1)^2)/ni(1,counter1+1))))-phi(counter1,1)));
+          <span class="keyword">else</span>
+              fn(counter1,1)=((b/((x(1,counter1+1)-x(1,counter1))^2))*((sqrtdensity(counter1+1,1))-2*(sqrtdensity(counter1,1)) +(sqrtdensity(counter1-1,1))))+(((sqrtdensity(counter1,1))/2)*(Vbetterguess(1,counter1+1)+((indicator)*((1/Q)*Vt*log((sqrtdensity(counter1,1)^2)/ni(1,counter1+1))))-phi(counter1,1)));
+          <span class="keyword">end</span>
+      <span class="keyword">end</span>
+      <span class="comment">% Jacobian Matrix for the electron and hole density equations</span>
+      <span class="keyword">for</span> counter1=1:No_of_nodes-2
+          <span class="keyword">for</span> counter2=1:No_of_nodes-2
+              <span class="keyword">if</span>(counter1==counter2)
+                  fndash(counter1,counter2)= ((-b*2)/((x(1,counter1+1)-x(1,counter1))^2)) + ((Vbetterguess(1,counter1+1))/2) - ((phi(counter1,1))/2) +  ((indicator*Vt)/(2*Q))*( 2 + (log(((sqrtdensity(counter1,1)^2)/ni(1,counter1+1))) )  );
+              <span class="keyword">elseif</span> (counter1+1 == counter2)
+                  fndash(counter1,counter2) = ((b)/((x(1,counter1+1)-x(1,counter1))^2));
+              <span class="keyword">elseif</span> (counter1 == counter2+1)
+                  fndash(counter1,counter2) = ((b)/((x(1,counter1+1)-x(1,counter1))^2));
+              <span class="keyword">else</span>
+                  fndash(counter1,counter2) = 0;
+              <span class="keyword">end</span>
+          <span class="keyword">end</span>
+      <span class="keyword">end</span>
+      fndash = sparse(fndash);
+      <span class="comment">% Newton Raphson formula</span>
+      sqrtdensitydiff = (fndash\fn);
+      sqrtdensity     = ((1).*sqrtdensity) - (alpha.*sqrtdensitydiff);
+
+      <span class="comment">% Condition/Tolerence Check</span>
+      <span class="keyword">if</span> max(abs(sqrtdensitydiff))&lt;Tolerence
+          <span class="keyword">break</span>;
+      <span class="keyword">end</span>
+
+      <span class="comment">% Checking for NaN Error</span>
+      <span class="keyword">if</span> isnan(sqrtdensitydiff)
+          <span class="keyword">break</span>;
+      <span class="keyword">end</span>
+
+      <span class="comment">% Maximum Number of Iterations of Inner Newton-Raphson Loop Condition Check</span>
+      <span class="keyword">if</span>(iteration&gt;MaxIter)
+          <span class="keyword">break</span>;
+      <span class="keyword">end</span>
+
+      norm(sqrtdensitydiff)
+      <span class="comment">%Printing Iteration number</span>
+
+      <span class="comment">% Updating the Variables</span>
+      iteration      = iteration+1;
+  <span class="keyword">end</span>
+
+  <span class="comment">% Reassigning</span>
+  charge(1)           = init;
+  charge(No_of_nodes) = last;
+  <span class="keyword">for</span> counter1=1:(No_of_nodes-2)
+    charge(counter1+1) = sqrtdensity(counter1)^2;
+  <span class="keyword">end</span>
+
+  <span class="comment">% Reorienting the Matrix</span>
+  charge = charge' ;
+
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in Newton_Raphson_Solver1 (line 13)
+    fndash         = zeros(No_of_nodes-2);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [ charge ] = Newton_Raphson_Solver1( fitting_factor,No_of_nodes,x,charge,Vt,Q,Vbetterguess,ni,n0,p0,Nc, indicator )
+% Newton Raphson Solver for electron and hole density
+  
+  % Initialisation of Variables
+  % Convergence factor for Inner Newton Raphson 
+    alpha       = 1;
+  % Maximum Number of Iterations of Inner Newton-Raphson Loop for charge density
+    MaxIter     = 1000;
+  % Tolerence allowed in the charge density profile in the material
+    Tolerence   = 1.0E-09;
+
+  % Pre-allocation
+    fndash         = zeros(No_of_nodes-2);
+    fn             = zeros(No_of_nodes-2,1);  
+    
+  % Considering only the middle elements of charge
+    sqrtdensity = charge(2:No_of_nodes-1).^0.5;
+    Nc          = Nc(2:No_of_nodes-1)';
+  
+  % Values of Constants
+    bn=fitting_factor/(12*1.08*Vt);            %bn calculation
+    bp=fitting_factor/(12*0.57*Vt);            %bp calculation
+   % phin=((Vt*log(ni/n0)));
+   % phip=((Vt*log(p0/ni)));
+    phin = Vt*log((sqrtdensity.^2)./Nc);
+     
+  % Electron and hole density boundary conditions
+    ninit = 0;
+    nend  = 0;
+    pinit = 0;    
+    pend  = 0;
+
+  % Selecting the Constants depending on the sign of chrage Density that we want to solve for  
+  if indicator == 1
+         b   = bp;
+         phi = phip;
+         init= pinit;
+         last= pend;
+        
+  elseif indicator == -1
+         b   = bn;
+         phi = phin;
+         init= ninit;
+         last= nend;
+  end 
+  
+  % The Loop solves the Density Gradient Equation for electron and hole density
+  iteration = 1;  % Keeps track of the Number of Iterations of the Inner Newton Raphson Loop
+   
+  while true  
+      fprintf('\n Newton Raphson Loop Iteration: \n');
+      disp(iteration);
+      
+      % Updating phi values
+         phi = Vt*log((sqrtdensity.^2)./Nc);
+
+      % Calculation of the electron and hole density equations
+      for counter1=1:No_of_nodes-2
+          if counter1==1
+              fn(counter1,1)=((b/((x(1,2)-x(1,1))^2))*((sqrtdensity(counter1+1,1))-2*(sqrtdensity(counter1,1))+(init)))+(((sqrtdensity(counter1,1))/2)*(Vbetterguess(1,counter1+1)+((indicator)*((1/Q)*Vt*log((sqrtdensity(counter1,1)^2)/ni(1,counter1+1))))-phi(counter1,1)));
+          elseif counter1==(No_of_nodes-2)
+              fn(counter1,1)=((b/((x(1,No_of_nodes-1)-x(1,No_of_nodes-2))^2))*((last)-2*(sqrtdensity(counter1,1))+(sqrtdensity(counter1-1,1))))+(((sqrtdensity(counter1,1))/2)*(Vbetterguess(1,counter1+1)+((indicator)*((1/Q)*Vt*log((sqrtdensity(counter1,1)^2)/ni(1,counter1+1))))-phi(counter1,1)));
+          else
+              fn(counter1,1)=((b/((x(1,counter1+1)-x(1,counter1))^2))*((sqrtdensity(counter1+1,1))-2*(sqrtdensity(counter1,1)) +(sqrtdensity(counter1-1,1))))+(((sqrtdensity(counter1,1))/2)*(Vbetterguess(1,counter1+1)+((indicator)*((1/Q)*Vt*log((sqrtdensity(counter1,1)^2)/ni(1,counter1+1))))-phi(counter1,1)));
+          end
+      end
+      % Jacobian Matrix for the electron and hole density equations
+      for counter1=1:No_of_nodes-2
+          for counter2=1:No_of_nodes-2
+              if(counter1==counter2)
+                  fndash(counter1,counter2)= ((-b*2)/((x(1,counter1+1)-x(1,counter1))^2)) + ((Vbetterguess(1,counter1+1))/2) - ((phi(counter1,1))/2) +  ((indicator*Vt)/(2*Q))*( 2 + (log(((sqrtdensity(counter1,1)^2)/ni(1,counter1+1))) )  );                          
+              elseif (counter1+1 == counter2)
+                  fndash(counter1,counter2) = ((b)/((x(1,counter1+1)-x(1,counter1))^2));
+              elseif (counter1 == counter2+1)
+                  fndash(counter1,counter2) = ((b)/((x(1,counter1+1)-x(1,counter1))^2));
+              else
+                  fndash(counter1,counter2) = 0;
+              end
+          end
+      end
+      fndash = sparse(fndash);
+      % Newton Raphson formula
+      sqrtdensitydiff = (fndash\fn);
+      sqrtdensity     = ((1).*sqrtdensity) - (alpha.*sqrtdensitydiff);
+              
+      % Condition/Tolerence Check      
+      if max(abs(sqrtdensitydiff))<Tolerence
+          break;
+      end
+      
+      % Checking for NaN Error
+      if isnan(sqrtdensitydiff)
+          break;
+      end
+      
+      % Maximum Number of Iterations of Inner Newton-Raphson Loop Condition Check
+      if(iteration>MaxIter)
+          break;
+      end     
+      
+      norm(sqrtdensitydiff)
+      %Printing Iteration number 
+      
+      % Updating the Variables
+      iteration      = iteration+1; 
+  end
+
+  % Reassigning
+  charge(1)           = init;
+  charge(No_of_nodes) = last;
+  for counter1=1:(No_of_nodes-2)
+    charge(counter1+1) = sqrtdensity(counter1)^2;
+  end
+
+  % Reorienting the Matrix
+  charge = charge' ;
+
+end
+
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,7 @@
+name           HfO2
+Eg             6.02
+E_affinity     2.5
+epsilon        20
+
+
+

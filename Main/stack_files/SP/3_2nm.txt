@@ -1,0 +1,79 @@
+<# Values of different properties must have the following units: #>
+<#                                                               #>
+<#      	distance/length           - nm                   #>
+<#		Energy, Band offsets etc  - eV                   #>
+<#		Nd, Na, Nv, Nc  etc       - cm^-3                #>
+<#		bias                      - Volts                #>
+<# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% #>
+
+
+<# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% #>
+<#                         Si/SiO2 MOSCAP                                #>
+<# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% #>
+
+Temperature
+	300
+end
+
+surface
+	type Schottky 1.013  <# Default Schottky barrier (Phi_m - Chi_s) is 0 #>
+	bias
+		0 0.4 0.8
+	// start step_size stop
+	end
+end
+
+layer SiO2
+	thickness		1
+	material		SiO2
+	Nd				0
+	Na				0
+	grid_spacing	0.1
+end
+
+
+layer Si
+    thickness 3.2
+    material  Si
+    // Default is zero 
+    Nd  0
+    Na  0
+    grid_spacing 0.1
+end
+
+layer SiO2
+	thickness		1
+	material		SiO2
+	Nd				0
+	Na				0
+	grid_spacing	0.1
+end
+
+
+substrate
+	type Zero_Slope
+end
+
+Controls
+
+	Solvers
+		//Poisson
+		Schrodinger_Poisson
+			SchrodingerStart	0
+			SchrodingerStop		5.2
+			max_iterations		300
+			tolerance		1e-15  // tolerance in the potential
+			//Anderson mixing parameters
+			mixing			0
+			alpha			1
+		end
+	end
+
+	Output_directory 
+		output/trial/dev1_sp
+	end
+
+	file_prefix
+		file_
+	end
+end

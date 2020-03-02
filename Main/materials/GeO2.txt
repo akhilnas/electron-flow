@@ -1,0 +1,6 @@
+name           GeO2
+Eg             5.76
+E_affinity     3.2
+epsilon        5
+
+

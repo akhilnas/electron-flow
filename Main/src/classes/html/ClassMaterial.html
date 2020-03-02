@@ -1,0 +1,169 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ClassMaterial</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-09-17"><meta name="DC.source" content="ClassMaterial.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">classdef</span> ClassMaterial
+
+    <span class="keyword">properties</span>
+        name,
+        Eg,
+        mn_eff , mn_t, mn_l,
+        mp_eff , mp_lh , mp_hh , mp_so = 0;
+        epsilon, Nc = 0, Nv = 0, E_affinity,
+        eta_C = 1,
+        eta_V = 1;
+    <span class="keyword">end</span>
+
+    <span class="keyword">methods</span>
+
+        <span class="keyword">function</span> mp_eff_val = get.mp_eff(Obj)
+            <span class="keyword">if</span>      isempty(Obj.mp_eff) &amp;&amp; ~isempty(Obj.mp_lh) &amp;&amp; ~isempty(Obj.mp_hh)
+                <span class="comment">% if mp_eff is not specified, but, mp_lh and mp_hh are</span>
+                <span class="comment">% specified</span>
+                mp_eff_val = ( Obj.mp_lh^1.5 + Obj.mp_hh^1.5 + Obj.mp_so^1.5 )^(2/3);
+            <span class="keyword">elseif</span>  isempty(Obj.mp_eff) &amp;&amp; ( isempty(Obj.mp_lh) || isempty(Obj.mp_hh) )
+                <span class="comment">% if mp_eff is not specified and, any of mp_lh and mp_hh</span>
+                <span class="comment">% are not specified</span>
+                mp_eff_val = 1;
+            <span class="keyword">else</span>
+                <span class="comment">% when mp_eff is specified</span>
+                mp_eff_val = Obj.mp_eff ;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> mn_eff_val = get.mn_eff(Obj)
+            <span class="keyword">if</span>      isempty(Obj.mn_eff) &amp;&amp; ~isempty(Obj.mn_t) &amp;&amp; ~isempty(Obj.mn_l)
+                <span class="comment">% if mn_eff is not specified, but, mn_l and mn_t are</span>
+                <span class="comment">% specified</span>
+                mn_eff_val = (Obj.mn_t * Obj.mn_t * Obj.mn_l)^(1/3);
+            <span class="keyword">elseif</span>  isempty(Obj.mn_eff) &amp;&amp; ( isempty(Obj.mn_t) || isempty(Obj.mn_l) )
+                <span class="comment">% if mp_eff is not specified and, any of mn_l and mn_t</span>
+                <span class="comment">% are not specified</span>
+                mn_eff_val = 1;
+            <span class="keyword">else</span>
+                <span class="comment">% when mn_eff is specified</span>
+                mn_eff_val = Obj.mn_eff;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> r = CheckValues(Obj)
+
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+classdef ClassMaterial
+    
+    properties
+        name,
+        Eg, 
+        mn_eff , mn_t, mn_l,
+        mp_eff , mp_lh , mp_hh , mp_so = 0; 
+        epsilon, Nc = 0, Nv = 0, E_affinity,
+        eta_C = 1, 
+        eta_V = 1;  
+    end
+    
+    methods
+        
+        function mp_eff_val = get.mp_eff(Obj)    
+            if      isempty(Obj.mp_eff) && ~isempty(Obj.mp_lh) && ~isempty(Obj.mp_hh)              
+                % if mp_eff is not specified, but, mp_lh and mp_hh are
+                % specified
+                mp_eff_val = ( Obj.mp_lh^1.5 + Obj.mp_hh^1.5 + Obj.mp_so^1.5 )^(2/3);
+            elseif  isempty(Obj.mp_eff) && ( isempty(Obj.mp_lh) || isempty(Obj.mp_hh) )             
+                % if mp_eff is not specified and, any of mp_lh and mp_hh
+                % are not specified
+                mp_eff_val = 1;
+            else
+                % when mp_eff is specified
+                mp_eff_val = Obj.mp_eff ;
+            end
+        end
+        
+        function mn_eff_val = get.mn_eff(Obj)
+            if      isempty(Obj.mn_eff) && ~isempty(Obj.mn_t) && ~isempty(Obj.mn_l)
+                % if mn_eff is not specified, but, mn_l and mn_t are
+                % specified
+                mn_eff_val = (Obj.mn_t * Obj.mn_t * Obj.mn_l)^(1/3);
+            elseif  isempty(Obj.mn_eff) && ( isempty(Obj.mn_t) || isempty(Obj.mn_l) ) 
+                % if mp_eff is not specified and, any of mn_l and mn_t
+                % are not specified
+                mn_eff_val = 1;
+            else
+                % when mn_eff is specified
+                mn_eff_val = Obj.mn_eff;
+            end
+        end
+        
+        function r = CheckValues(Obj)
+            
+        end
+        
+    end
+end
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,441 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>PARSER_CONTROLS</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-09-17"><meta name="DC.source" content="parser_controls.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>PARSER_CONTROLS</h1><!--introduction--><pre>parses controls section of ideal C-V input
+Output directory parsing for ideal C-V (attaches file prefix)
+Border trap solvers</pre><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">function: parser_controls</a></li><li><a href="#3">ClassControls</a></li><li><a href="#4">Solvers</a></li><li><a href="#8">Mixing parameters</a></li><li><a href="#10">Border Trap solving</a></li><li><a href="#12">Output directory code</a></li><li><a href="#15">file_prefix</a></li><li><a href="#18">Error for controls and output dir</a></li><li><a href="#20">TODO: Border trap dependence?</a></li></ul></div><h2>function: parser_controls<a name="1"></a></h2><pre>Input: text from input file
+Output: OutParser.controls
+Called by :</pre><p>
+<a href= "parser.html" > "parser.m"  </a>
+</p><pre class="codeinput"><span class="keyword">function</span> [var_Controls, NoWords] = parser_controls(C,i,LineNo)
+</pre><pre class="codeinput">var_Controls = ClassControls;
+</pre><pre class="codeoutput">Undefined function or variable 'ClassControls'.
+
+Error in parser_controls (line 21)
+var_Controls = ClassControls;
+</pre><h2>ClassControls<a name="3"></a></h2><p>
+<a href= "../../classes/html/ClassControls.html" > ClassControls  </a>
+</p><pre class="codeinput">j = 1;
+
+<span class="keyword">while</span> ((i+j)&lt;= length(C{:}) &amp;&amp; ~strcmp(C{1}{i+j},<span class="string">'end'</span>))
+    <span class="keyword">switch</span> C{1}{i+j}
+</pre><h2>Solvers<a name="4"></a></h2><pre class="codeinput">        <span class="keyword">case</span> <span class="string">'Solvers'</span>
+</pre><pre class="codeinput">            j = j+1;
+            <span class="keyword">while</span> (~strcmp(C{1}{i+j},<span class="string">'end'</span>))
+                <span class="keyword">switch</span> C{1}{i+j}
+                 <span class="comment">%* Schrodinger POisson</span>
+				  <span class="keyword">case</span> <span class="string">'Schrodinger_Poisson'</span>
+</pre><pre class="codeinput">                        j = j+1;
+                        var_Controls.Solvers.SP = 1;
+                        <span class="keyword">while</span> (~strcmp(C{1}{i+j},<span class="string">'end'</span>))
+                            <span class="keyword">switch</span> C{1}{i+j}
+                       			<span class="keyword">case</span> <span class="string">'SchrodingerStart'</span>
+                                    j = j+1;
+                                    <span class="keyword">if</span> isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    <span class="keyword">end</span>
+                                    var_Controls.Schodinger_Poisson.SchrodingerStart = str2double(C{1}{i+j});
+                                <span class="keyword">case</span> <span class="string">'SchrodingerStop'</span>
+                                    j = j+1;
+                                    <span class="keyword">if</span> isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    <span class="keyword">end</span>
+                                    var_Controls.Schodinger_Poisson.SchrodingerStop  = str2double(C{1}{i+j});
+                                <span class="keyword">case</span> <span class="string">'max_iterations'</span>
+                                    j = j+1;
+                                    <span class="keyword">if</span> isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    <span class="keyword">end</span>
+                                    var_Controls.Schodinger_Poisson.max_iterations   = str2double(C{1}{i+j});
+                                <span class="keyword">case</span> <span class="string">'tolerance'</span>
+</pre><pre class="codeinput">                                    j = j+1;
+                                    <span class="keyword">if</span> isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    <span class="keyword">end</span>
+                                    var_Controls.Schodinger_Poisson.tolerance  = str2double(C{1}{i+j});
+</pre><h2>Mixing parameters<a name="8"></a></h2><pre class="codeinput">								<span class="keyword">case</span> <span class="string">'mixing'</span>
+                                    j = j+1;
+                                    <span class="keyword">if</span> isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    <span class="keyword">end</span>
+                                    var_Controls.Schodinger_Poisson.mixing   = str2double(C{1}{i+j});
+                                <span class="keyword">case</span> <span class="string">'alpha'</span>
+                                    j = j+1;
+                                    <span class="keyword">if</span> isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    <span class="keyword">end</span>
+                                    var_Controls.Schodinger_Poisson.alpha    = str2double(C{1}{i+j});
+                                <span class="keyword">case</span> <span class="string">'&lt;#'</span>
+                                    j = j + comment(C,i+j);
+                                <span class="keyword">otherwise</span>
+                                    msgStr = <span class="string">'error: Unable to evaulate the command ''%s'' (input line No %d)'</span>;
+                                    err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,C{1}{i+j},LineNo(i+j));
+                                    throw(err);
+                            <span class="keyword">end</span>
+                            j = j+1;
+                        <span class="keyword">end</span>
+                        j = j+1;
+</pre><h2>Border Trap solving<a name="10"></a></h2><pre class="codeinput">                    <span class="keyword">case</span> <span class="string">'Border_Trap'</span>
+                        j = j+1;
+                        var_Controls.Solvers.Trap = 1;
+                        <span class="keyword">while</span> (~strcmp(C{1}{i+j},<span class="string">'end'</span>))
+                           <span class="keyword">switch</span> C{1}{i+j}
+                               <span class="keyword">case</span> <span class="string">'Trap_Layer'</span>
+                                   var_Controls.Border_Trap.Trap_Layer = C{1}{i+j};
+                               <span class="keyword">case</span> <span class="string">'Injection_Layer'</span>
+                                   var_Controls.Border_Trap.Injecting_Layer = C{1}{i+j};
+                               <span class="keyword">case</span> <span class="string">'grid_spacing'</span>
+                                   <span class="keyword">if</span> isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                   <span class="keyword">end</span>
+                                   var_Controls.Border_Trap.grid_spacing = str2double(C{1}{i+j});
+                               <span class="keyword">case</span> <span class="string">'&lt;#'</span>
+                                   j = j + comment(C,i+j);
+                               <span class="keyword">otherwise</span>
+                                   msgStr = <span class="string">'error: Unable to evaulate the command ''%s'' (input line No %d)'</span>;
+                                   err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,C{1}{i+j},LineNo(i+j));
+                                   throw(err);
+                           <span class="keyword">end</span>
+                           j = j+1;
+                        <span class="keyword">end</span>
+                    <span class="keyword">otherwise</span>
+                        msgStr = <span class="string">'error: Unable to evaulate the command ''%s'' (input line No %d)'</span>;
+                        err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,C{1}{i+j},LineNo(i+j));
+                        throw(err);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+</pre><h2>Output directory code<a name="12"></a></h2><pre class="codeinput">        <span class="keyword">case</span> <span class="string">'Output_directory'</span>
+</pre><pre class="codeinput">            temp1 = j;
+            j = j+1;
+            temp = {};
+            <span class="keyword">while</span> (~strcmp(C{1}{i+j},<span class="string">'end'</span>))
+                <span class="keyword">if</span> strcmp(C{1}{i+j},<span class="string">'&lt;#'</span>)
+                    j = j + comment(C,i+j);
+                <span class="keyword">else</span>
+                    temp = {temp{:} C{1}{i+j}};
+                <span class="keyword">end</span>
+                j = j+1;
+            <span class="keyword">end</span>
+            <span class="keyword">if</span> length(temp) ~= 1
+                msgStr = <span class="string">'error: Invalid arguments found for ''Output_directory'' (input line No %d)'</span>;
+                err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,LineNo(i+temp1));
+                throw(err);
+            <span class="keyword">end</span>
+            var_Controls.Output_directory = temp{1} ;
+            <span class="comment">% Create the directory to make sure the directory can be</span>
+            <span class="comment">% created with the given path and name</span>
+            <span class="keyword">if</span> ~exist(var_Controls.Output_directory,<span class="string">'dir'</span>)
+                [status,message] = mkdir(var_Controls.Output_directory);
+                <span class="keyword">if</span> ~status
+                    msgStr = <span class="string">'error: Can not create the directory ''%s'' (input line No %d): %s '</span>;
+                    err = MException(<span class="string">'MATLAB:MKDIR:OSError'</span>,msgStr,var_Controls.Output_directory,LineNo(temp1),message);
+                    throw(err);
+                <span class="keyword">end</span>
+            <span class="keyword">else</span>
+                fid = fopen(fullfile(var_Controls.Output_directory,<span class="string">'test'</span>),<span class="string">'w'</span>);
+                <span class="keyword">if</span> fid &lt;=0
+                    msgStr = <span class="string">'error: Folder ''%s'' is write protected (input line No %d) '</span>;
+                    err = MException(<span class="string">'MATLAB:MKDIR:OSError'</span>,msgStr,var_Controls.Output_directory,LineNo(i+temp1));
+                    throw(err);
+                <span class="keyword">else</span>
+                    delete(fullfile(var_Controls.Output_directory,<span class="string">'test'</span>));
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+</pre><h2>file_prefix<a name="15"></a></h2><pre class="codeinput">        <span class="keyword">case</span> <span class="string">'file_prefix'</span>
+            temp1 = j;
+            j = j+1;
+            temp = {};
+            <span class="keyword">while</span> (~strcmp(C{1}{i+j},<span class="string">'end'</span>))
+                <span class="keyword">if</span> strcmp(C{1}{i+j},<span class="string">'&lt;#'</span>)
+                    j = j + comment(C,i+j);
+                <span class="keyword">else</span>
+                    temp = {temp{:} C{1}{i+j}};
+                <span class="keyword">end</span>
+                j = j+1;
+            <span class="keyword">end</span>
+            <span class="keyword">if</span> length(temp) ~= 1
+                msgStr = <span class="string">'error: Invalid arguments found for ''file_prefix'' (input line No %d)'</span>;
+                err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,LineNo(i+temp1));
+                throw(err);
+            <span class="keyword">end</span>
+            var_Controls.file_prefix = temp{:} ;
+            clear <span class="string">temp</span> <span class="string">temp1</span>;
+        <span class="keyword">case</span> <span class="string">'&lt;#'</span>
+            j = j + comment(C,i+j);
+        <span class="keyword">otherwise</span>
+</pre><pre class="codeinput">            msgStr = <span class="string">'error: Unable to evaulate the command ''%s'' (input line No %d)'</span>;
+            err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,C{1}{i+j},LineNo(i+j));
+            throw(err);
+    <span class="keyword">end</span>
+    j = j+1;
+<span class="keyword">end</span>
+
+NoWords = j;
+</pre><h2>Error for controls and output dir<a name="18"></a></h2><pre class="codeinput">    <span class="keyword">function</span> throwErr(value,property,lineNo)
+        strMsg1 = <span class="string">'error: Invalid value ''%s'' detected for property ''%s'' (input line No %d)'</span>;
+        err1 = MException(<span class="string">'MATLAB:InvalidValue'</span>,strMsg1,value,property,lineNo);
+        throw(err1);
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><h2>TODO: Border trap dependence?<a name="20"></a></h2><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% PARSER_CONTROLS
+%  parses controls section of ideal C-V input
+% Output directory parsing for ideal C-V (attaches file prefix)
+% Border trap solvers
+
+%%% function: parser_controls
+%  Input: text from input file
+% Output: OutParser.controls 
+% Called by :
+%
+% <html> 
+% <a href= "parser.html" > "parser.m"  </a> 
+% </html>
+
+
+
+
+
+function [var_Controls, NoWords] = parser_controls(C,i,LineNo)
+
+var_Controls = ClassControls;
+%% ClassControls
+% <html> 
+% <a href= "../../classes/html/ClassControls.html" > ClassControls  </a> 
+% </html>
+
+j = 1;
+
+while ((i+j)<= length(C{:}) && ~strcmp(C{1}{i+j},'end'))
+    switch C{1}{i+j}
+	    %% Solvers
+        case 'Solvers'
+            j = j+1;
+            while (~strcmp(C{1}{i+j},'end'))
+                switch C{1}{i+j}
+                 %* Schrodinger POisson   
+				  case 'Schrodinger_Poisson'
+                        j = j+1;
+                        var_Controls.Solvers.SP = 1;
+                        while (~strcmp(C{1}{i+j},'end'))
+                            switch C{1}{i+j}
+                       			case 'SchrodingerStart'
+                                    j = j+1;
+                                    if isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    end
+                                    var_Controls.Schodinger_Poisson.SchrodingerStart = str2double(C{1}{i+j});
+                                case 'SchrodingerStop'
+                                    j = j+1;
+                                    if isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    end
+                                    var_Controls.Schodinger_Poisson.SchrodingerStop  = str2double(C{1}{i+j});
+                                case 'max_iterations'
+                                    j = j+1;
+                                    if isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    end
+                                    var_Controls.Schodinger_Poisson.max_iterations   = str2double(C{1}{i+j});
+                                case 'tolerance'
+                                    j = j+1;
+                                    if isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    end
+                                    var_Controls.Schodinger_Poisson.tolerance  = str2double(C{1}{i+j});
+                                %% Mixing parameters
+								case 'mixing'
+                                    j = j+1;
+                                    if isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    end
+                                    var_Controls.Schodinger_Poisson.mixing   = str2double(C{1}{i+j});
+                                case 'alpha'
+                                    j = j+1;
+                                    if isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                    end
+                                    var_Controls.Schodinger_Poisson.alpha    = str2double(C{1}{i+j});
+                                case '<#'
+                                    j = j + comment(C,i+j);
+                                otherwise
+                                    msgStr = 'error: Unable to evaulate the command ''%s'' (input line No %d)';
+                                    err = MException('MATLAB:InvalidCommand',msgStr,C{1}{i+j},LineNo(i+j));
+                                    throw(err);
+                            end
+                            j = j+1;
+                        end
+                        j = j+1;
+						%% Border Trap solving
+                    case 'Border_Trap'
+                        j = j+1;
+                        var_Controls.Solvers.Trap = 1;
+                        while (~strcmp(C{1}{i+j},'end'))
+                           switch C{1}{i+j}
+                               case 'Trap_Layer'
+                                   var_Controls.Border_Trap.Trap_Layer = C{1}{i+j};  
+                               case 'Injection_Layer'
+                                   var_Controls.Border_Trap.Injecting_Layer = C{1}{i+j}; 
+                               case 'grid_spacing'
+                                   if isnan(str2double(C{1}{i+j}))
+                                        throwErr(C{1}{i+j},C{1}{i+j-1},LineNo(i+j));
+                                   end
+                                   var_Controls.Border_Trap.grid_spacing = str2double(C{1}{i+j});
+                               case '<#'
+                                   j = j + comment(C,i+j);
+                               otherwise
+                                   msgStr = 'error: Unable to evaulate the command ''%s'' (input line No %d)';
+                                   err = MException('MATLAB:InvalidCommand',msgStr,C{1}{i+j},LineNo(i+j));
+                                   throw(err);
+                           end
+                           j = j+1;
+                        end                        
+                    otherwise
+                        msgStr = 'error: Unable to evaulate the command ''%s'' (input line No %d)';
+                        err = MException('MATLAB:InvalidCommand',msgStr,C{1}{i+j},LineNo(i+j));
+                        throw(err);
+                end
+            end
+			%% Output directory code
+        case 'Output_directory'
+            temp1 = j;
+            j = j+1;
+            temp = {};
+            while (~strcmp(C{1}{i+j},'end'))
+                if strcmp(C{1}{i+j},'<#')                    
+                    j = j + comment(C,i+j);
+                else
+                    temp = {temp{:} C{1}{i+j}};
+                end
+                j = j+1;
+            end
+            if length(temp) ~= 1
+                msgStr = 'error: Invalid arguments found for ''Output_directory'' (input line No %d)';
+                err = MException('MATLAB:InvalidCommand',msgStr,LineNo(i+temp1));
+                throw(err);
+            end
+            var_Controls.Output_directory = temp{1} ;
+            % Create the directory to make sure the directory can be
+            % created with the given path and name
+            if ~exist(var_Controls.Output_directory,'dir')
+                [status,message] = mkdir(var_Controls.Output_directory);
+                if ~status
+                    msgStr = 'error: Can not create the directory ''%s'' (input line No %d): %s ';
+                    err = MException('MATLAB:MKDIR:OSError',msgStr,var_Controls.Output_directory,LineNo(temp1),message);
+                    throw(err);
+                end
+            else 
+                fid = fopen(fullfile(var_Controls.Output_directory,'test'),'w');
+                if fid <=0
+                    msgStr = 'error: Folder ''%s'' is write protected (input line No %d) ';
+                    err = MException('MATLAB:MKDIR:OSError',msgStr,var_Controls.Output_directory,LineNo(i+temp1));
+                    throw(err);
+                else 
+                    delete(fullfile(var_Controls.Output_directory,'test'));
+                end
+            end
+          %% file_prefix  
+        case 'file_prefix'
+            temp1 = j;
+            j = j+1;
+            temp = {};
+            while (~strcmp(C{1}{i+j},'end'))
+                if strcmp(C{1}{i+j},'<#')
+                    j = j + comment(C,i+j);
+                else
+                    temp = {temp{:} C{1}{i+j}};
+                end
+                j = j+1;
+            end
+            if length(temp) ~= 1
+                msgStr = 'error: Invalid arguments found for ''file_prefix'' (input line No %d)';
+                err = MException('MATLAB:InvalidCommand',msgStr,LineNo(i+temp1));
+                throw(err);
+            end
+            var_Controls.file_prefix = temp{:} ;
+            clear temp temp1;
+        case '<#'
+            j = j + comment(C,i+j);
+        otherwise
+            msgStr = 'error: Unable to evaulate the command ''%s'' (input line No %d)';
+            err = MException('MATLAB:InvalidCommand',msgStr,C{1}{i+j},LineNo(i+j));
+            throw(err);
+    end
+    j = j+1;
+end
+
+NoWords = j;
+%% Error for controls and output dir
+    function throwErr(value,property,lineNo)
+        strMsg1 = 'error: Invalid value ''%s'' detected for property ''%s'' (input line No %d)';
+        err1 = MException('MATLAB:InvalidValue',strMsg1,value,property,lineNo);
+        throw(err1);
+    end
+
+end
+%% TODO: Border trap dependence?
+##### SOURCE END #####
+--></body></html>

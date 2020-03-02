@@ -1,0 +1,6 @@
+name           Gd2O3
+Eg             5.3
+E_affinity     2
+epsilon        20
+
+

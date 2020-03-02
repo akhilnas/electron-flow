@@ -1,0 +1,245 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>PARSER_SUBSTRATE</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-09-17"><meta name="DC.source" content="parser_substrate.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>PARSER_SUBSTRATE</h1><!--introduction--><p>parses substrate section of ideal C-V input</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">function: parser_substrate</a></li><li><a href="#3">ClassSubstrate</a></li><li><a href="#4">Type: Schottky, Ohmic, zeroslope</a></li><li><a href="#5">bias</a></li><li><a href="#8">TODO: schottky, Ohmic, zero slope? THis version supports only one?</a></li></ul></div><h2>function: parser_substrate<a name="1"></a></h2><pre>Input: text from input file
+Output: OutParser.substrate
+Called by :</pre><p>
+<a href= "parser.html" > "parser.m"  </a>
+</p><pre class="codeinput"><span class="keyword">function</span> [var_substrate, NoWords] = parser_substrate(C,i,LineNo)
+</pre><h2>ClassSubstrate<a name="3"></a></h2><p>
+<a href= "../../classes/html/ClassSubstrate.html" > ClassSubstrate  </a>
+</p><pre class="codeinput">var_substrate = ClassSubstrate;
+
+j = 1;
+
+<span class="keyword">while</span> ((i+j)&lt;= length(C{:}) &amp;&amp; ~strcmp(C{1}{i+j},<span class="string">'end'</span>))
+    <span class="keyword">switch</span> C{1}{i+j}
+        <span class="keyword">case</span> <span class="string">'type'</span>
+</pre><h2>Type: Schottky, Ohmic, zeroslope<a name="4"></a></h2><pre class="codeinput">            j = j+1;
+            <span class="keyword">switch</span> C{1}{i+j}
+                <span class="keyword">case</span> <span class="string">'Schottky'</span>
+                    j = j+1;
+                    var_substrate.Schottky = 1;
+                    <span class="keyword">if</span> isnan(str2double(C{1}{i+j}))
+                       strMsg = <span class="string">'error: Invalid argument detected for ''Schottky''  (input line No %d)'</span>;
+                       err = MException(<span class="string">'MATLAB:InvalidValue'</span>,strMsg,LineNo(i+j));
+                       throw(err);
+                    <span class="keyword">end</span>
+                    var_substrate.barrier = str2double(C{1}{i+j});
+                <span class="keyword">case</span> <span class="string">'Ohmic'</span>
+                    j = j+1;
+                    var_substrate.Ohminc = 1;
+                    <span class="keyword">if</span> isnan(str2double(C{1}{i+j}))
+                       strMsg = <span class="string">'error: Invalid argument detected for ''Ohmic''  (input line No %d)'</span>;
+                       err = MException(<span class="string">'MATLAB:InvalidValue'</span>,strMsg,LineNo(i+j));
+                       throw(err);
+                    <span class="keyword">end</span>
+                    var_substrate.barrier = str2double(C{1}{i+j});
+                <span class="keyword">case</span> <span class="string">'Zero_Slope'</span>
+                    var_substrate.Zero_Slope = 1;
+                <span class="keyword">otherwise</span>
+                    msgStr = <span class="string">'error: Unable to evaulate the command ''%s'' (input line No %d)'</span>;
+                    err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,C{1}{i+j},LineNo(i+j));
+                    throw(err);
+            <span class="keyword">end</span>
+</pre><h2>bias<a name="5"></a></h2><pre class="codeinput">        <span class="keyword">case</span> <span class="string">'bias'</span>
+             k = 1; A = [];
+            <span class="keyword">while</span> (~strcmp(C{1}{i+j+k},<span class="string">'end'</span>) )
+                A = [A <span class="string">' '</span> C{1}{i+j+k}];
+                k = k+1;
+            <span class="keyword">end</span>
+
+            A = textscan(A,<span class="string">'%s'</span>,<span class="string">'delimiter'</span>,<span class="string">';'</span>);
+
+            <span class="keyword">for</span> ii = 1:length(A{:})
+                var_surface.bias{ii} = [];
+                temp = textscan(A{1}{ii},<span class="string">'%s'</span>, <span class="string">'delimiter'</span>,<span class="string">','</span>);
+                <span class="keyword">for</span> jj = 1:length(temp{:})
+                    temp1 = textscan(temp{1}{jj},<span class="string">'%s'</span>);
+                    temp2 = str2double(temp1{1});
+                    <span class="keyword">if</span> any(isnan(temp2)) || length(temp2)~=3
+                        msgStr = <span class="string">'error: Invalid arguments found for property ''%s'' (input line No %d) '</span>;
+                        err    = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,C{1}{i+j},LineNo(i+j));
+                        throw(err);
+                    <span class="keyword">end</span>
+                    D{ii,jj} = temp2;
+                    var_surface.bias{ii} = [var_surface.bias{ii} D{ii,jj}(1):D{ii,jj}(2):D{ii,jj}(3)];
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            j = j+k;
+        <span class="keyword">case</span> <span class="string">'&lt;#'</span>
+            j = j + comment(C,i+j);
+        <span class="keyword">otherwise</span>
+            msgStr = <span class="string">'error: Unable to evaulate the command ''%s'' (input line No %d)'</span>;
+            err = MException(<span class="string">'MATLAB:InvalidCommand'</span>,msgStr,C{1}{i+j+k},LineNo(i+j+k));
+            throw(err);
+    <span class="keyword">end</span>
+    j = j+1;
+<span class="keyword">end</span>
+
+NoWords = j;
+</pre><pre class="codeoutput">Undefined function or variable 'ClassSubstrate'.
+
+Error in parser_substrate (line 20)
+var_substrate = ClassSubstrate;
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><h2>TODO: schottky, Ohmic, zero slope? THis version supports only one?<a name="8"></a></h2><p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% PARSER_SUBSTRATE
+% parses substrate section of ideal C-V input
+
+%%% function: parser_substrate
+%  Input: text from input file
+% Output: OutParser.substrate 
+% Called by :
+%
+% <html> 
+% <a href= "parser.html" > "parser.m"  </a> 
+% </html>
+
+
+function [var_substrate, NoWords] = parser_substrate(C,i,LineNo)
+
+%% ClassSubstrate
+% <html> 
+% <a href= "../../classes/html/ClassSubstrate.html" > ClassSubstrate  </a> 
+% </html>
+var_substrate = ClassSubstrate;
+
+j = 1;
+
+while ((i+j)<= length(C{:}) && ~strcmp(C{1}{i+j},'end'))
+    switch C{1}{i+j}
+        case 'type' 
+		%% Type: Schottky, Ohmic, zeroslope
+            j = j+1;
+            switch C{1}{i+j}
+                case 'Schottky'
+                    j = j+1;
+                    var_substrate.Schottky = 1;
+                    if isnan(str2double(C{1}{i+j}))
+                       strMsg = 'error: Invalid argument detected for ''Schottky''  (input line No %d)'; 
+                       err = MException('MATLAB:InvalidValue',strMsg,LineNo(i+j));
+                       throw(err);
+                    end
+                    var_substrate.barrier = str2double(C{1}{i+j});
+                case 'Ohmic'
+                    j = j+1;
+                    var_substrate.Ohminc = 1;                
+                    if isnan(str2double(C{1}{i+j}))
+                       strMsg = 'error: Invalid argument detected for ''Ohmic''  (input line No %d)'; 
+                       err = MException('MATLAB:InvalidValue',strMsg,LineNo(i+j));
+                       throw(err);
+                    end
+                    var_substrate.barrier = str2double(C{1}{i+j});
+                case 'Zero_Slope'                    
+                    var_substrate.Zero_Slope = 1;
+                otherwise
+                    msgStr = 'error: Unable to evaulate the command ''%s'' (input line No %d)';
+                    err = MException('MATLAB:InvalidCommand',msgStr,C{1}{i+j},LineNo(i+j));
+                    throw(err);                    
+            end
+            %% bias
+        case 'bias'
+             k = 1; A = [];
+            while (~strcmp(C{1}{i+j+k},'end') )                
+                A = [A ' ' C{1}{i+j+k}];
+                k = k+1;
+            end
+            
+            A = textscan(A,'%s','delimiter',';');
+            
+            for ii = 1:length(A{:})
+                var_surface.bias{ii} = [];
+                temp = textscan(A{1}{ii},'%s', 'delimiter',',');
+                for jj = 1:length(temp{:})
+                    temp1 = textscan(temp{1}{jj},'%s');
+                    temp2 = str2double(temp1{1});
+                    if any(isnan(temp2)) || length(temp2)~=3
+                        msgStr = 'error: Invalid arguments found for property ''%s'' (input line No %d) ';
+                        err    = MException('MATLAB:InvalidCommand',msgStr,C{1}{i+j},LineNo(i+j));
+                        throw(err);
+                    end
+                    D{ii,jj} = temp2;
+                    var_surface.bias{ii} = [var_surface.bias{ii} D{ii,jj}(1):D{ii,jj}(2):D{ii,jj}(3)];
+                end                
+            end            
+            j = j+k;        
+        case '<#'
+            j = j + comment(C,i+j);            
+        otherwise
+            msgStr = 'error: Unable to evaulate the command ''%s'' (input line No %d)';
+            err = MException('MATLAB:InvalidCommand',msgStr,C{1}{i+j+k},LineNo(i+j+k));
+            throw(err);            
+    end
+    j = j+1;
+end    
+
+NoWords = j;    
+end
+
+%% TODO: schottky, Ohmic, zero slope? THis version supports only one?
+##### SOURCE END #####
+--></body></html>

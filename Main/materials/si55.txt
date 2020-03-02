@@ -1,0 +1,11 @@
+name          si55
+Eg            1.12       // eV
+E_affinity    4.05       // eV
+mn            0.3283
+mp_lh         0.49
+mp_hh         0.16
+// mp_so      0
+epsilon      11.9
+Nc            0.22e19     // cm^-3, Nc = 0 by default
+Nv            0.124e19    // cm^-3, Nv = 0 by default
+eta_C         6          

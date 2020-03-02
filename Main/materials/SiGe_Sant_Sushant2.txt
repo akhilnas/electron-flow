@@ -1,0 +1,22 @@
+name          Si
+Eg            0.78       // eV
+E_affinity    4.04       // eV
+mn            0.33
+mp            0.24
+// mp_so      0
+epsilon      14.35
+Nc            1.1797e19     // cm^-3, Nc = 0 by default
+Nv            2.3245e18    // cm^-3, Nv = 0 by default
+eta_C         4          // Conduction band degenaracy, default = 1
+
+
+
+// Optionally, you can directly specify values for mn* and mp* using the
+// following keywords
+// mn 0.328
+// mp 0.527
+// If you specify mn and mp explicitly, values of 
+// mn_t, mn_l, mp_lh, mp_hh, mp_so will be ignored
+
+// if mn and any of mn_l or mn_t is not specified, mn will be assumed
+// a value = 1.  Similarly for mp.

@@ -1,0 +1,9 @@
+name           SiO2
+Eg             9.0
+epsilon        3.9
+mn             1
+mp_lh         1
+mp_hh         1
+eta_C         6          
+
+

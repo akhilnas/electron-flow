@@ -1,0 +1,10 @@
+name          inga
+Eg            0.74     // eV
+E_affinity    4.2      // eV
+mn          0.04
+mp        0.45
+// mp_so      0
+epsilon      12
+Nc            2.1e17     // cm^-3, Nc = 0 by default
+Nv            7.7e18  
+eta_C         2         

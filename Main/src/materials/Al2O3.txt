@@ -1,0 +1,4 @@
+name           Al2O3
+Eg             6.6
+E_affinity     1.4
+epsilon        8

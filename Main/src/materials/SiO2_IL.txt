@@ -1,0 +1,4 @@
+name           SiO2
+Eg             6.0
+E_affinity     0.9
+epsilon        10

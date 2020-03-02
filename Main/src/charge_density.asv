@@ -1,0 +1,139 @@
+function [rho, n_charge, p_charge] = charge_density(OutGenerate, OutSchr, Ec_new, Ev_new)
+
+global Kb hbar Q
+
+persistent SR CLS IsFirst
+if(OutGenerate.control.Solvers.SP)
+Psi2_C      = OutSchr.Psi2_C;
+Psi2_V      = OutSchr.Psi2_V;
+Eigen_val_C = OutSchr.Eigen_val_C;
+Eigen_val_V = OutSchr.Eigen_val_V;
+
+SchrStart   = OutGenerate.SchrStart;
+SchrStop    = OutGenerate.SchrStop;
+UseSchr.C = 1; UseSchr.V = 1;
+if isempty(IsFirst)
+    IsFirst = 0;
+end
+
+if IsFirst == 0
+    SR  = ~logical(1:No_of_nodes);
+    SR(SchrStart:SchrStop) = true;
+    CLS = ~SR;
+end
+
+IsFirst = IsFirst + 1;
+
+else
+   UseSchr.C = 0; UseSchr.V = 0; 
+end
+
+Ef          = OutGenerate.Ef;
+eta_C       = OutGenerate.eta_C;
+eta_V       = OutGenerate.eta_V;
+mn_eff      = OutGenerate.mn_eff;
+mp_eff      = OutGenerate.mp_eff;
+Nd          = OutGenerate.Nd;
+Na          = OutGenerate.Na;
+Nc          = OutGenerate.Nc;
+Nv          = OutGenerate.Nv;
+Tempr       = OutGenerate.Tempr;
+No_of_nodes = length(OutGenerate.x);
+
+n_charge = zeros(1,No_of_nodes);
+p_charge = zeros(1,No_of_nodes);
+
+
+
+
+%% n_charge
+
+if UseSchr.C
+    
+    temp = (max(Ef)-Eigen_val_C)/(Kb*Tempr);
+    
+    % We are considering that many states, so that (Ef-E)/Kb*Tempr
+    % of the highest state considered is less than ~ -8
+    
+    temp1 = find(temp<-8,1,'first');
+    
+    No_of_states_to_consider = temp1;
+    
+    for i=1:No_of_states_to_consider
+        n_charge(SR) = n_charge(SR) + ( eta_C(SR).*mn_eff (SR).*Kb*Tempr/(pi*hbar^2) )...
+            .* Psi2_C(:,i)' .* log( 1+exp( (Ef(SR)-Eigen_val_C(i) )/(Kb*Tempr) ) );
+    end
+    
+    n_charge(CLS) = Nc(CLS).*exp((Ef(CLS)-Ec_new(CLS))/(Kb*Tempr) );
+end
+
+
+%% p_charge
+
+if  UseSchr.V
+    
+    temp = (Eigen_val_V-min(Ef))/(Kb*Tempr);
+    
+    % We are considering that many states, so that (E-Ef)/Kb*Tempr
+    % of the highest state considered is less than ~ -8
+    
+    temp1 = find(temp<-8,1,'first');
+    
+    No_of_states_to_consider = temp1;
+    
+    for i=1:No_of_states_to_consider
+        p_charge(SR) = p_charge(SR) + ( eta_V(SR).*mp_eff(SR).*Kb*Tempr/(pi*hbar^2) )...
+            .* Psi2_V(:,i)' .* log( 1+exp( (Eigen_val_V(i)-Ef(SR) )/(Kb*Tempr) ) );
+    end
+    
+    p_charge(CLS) = Nv(CLS).*exp((Ev_new(CLS)-Ef(CLS))/(Kb*Tempr) );
+    
+end
+
+%%  Classical
+
+if ~UseSchr.C
+    % Classical electron Charge
+    n_charge = Nc.*exp((Ef-Ec_new)/(Kb*Tempr) );
+end
+if ~UseSchr.V
+    % Classical hole charge
+    p_charge = Nv.*exp((Ev_new-Ef)/(Kb*Tempr) );
+end
+
+rho = Q*(Nd-Na+p_charge-n_charge);  % Q = |electron charge|
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Qit addition
+
+% Eg = 1.1/13.6;
+% Ei = Eg/2; % approximate intrinsic level
+% trap_loc_index = 11;
+% 
+% zeta = linspace(0,Eg,50) - Ei; % Energy measured wrt to intrinsic level
+% 
+% Dita = zeros(1,length(zeta));
+% Ditd = zeros(1,length(zeta));
+% 
+% DD = 5e13;
+% Dita(round(0.5*length(zeta)):end) = DD;
+% Ditd(1:round(0.5*length(zeta))-1) = DD;
+% 
+% Ei_s(i) = OutGenerate.Ei(trap_loc_index) - V_out(trap_loc_index);
+% Ef_s(i) = OutGenerate.Ef(trap_loc_index);
+% 
+% temp = 1 + exp( (zeta+Ei_s(i)-Ef_s(i))/(Kb*Tempr) );
+% 
+% Qit = Q*(0.529e-8)^2 * trapz(zeta*13.6,Ditd)  ...
+%    - Q*(0.529e-8)^2 * trapz(zeta*13.6,(Dita+Ditd)./temp);
+% 
+% x = OutGenerate.x;
+% h1 = abs(x(trap_loc_index)-x(trap_loc_index-1));
+% h2 = abs(x(trap_loc_index+1)-x(trap_loc_index));
+% rho_it = Qit*2/(h1+h2);
+% %  rho
+% 
+% rho = Q*(Nd-Na+p_charge-n_charge);  % Q = |electron charge|
+% rho(trap_loc_index) = rho(trap_loc_index) + rho_it;
+
+end

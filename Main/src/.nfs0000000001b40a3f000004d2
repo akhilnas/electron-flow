@@ -1,0 +1,86 @@
+function  [tau_p_trap,tau_n_trap,i] = parse_trap_time_constant1(C,psi,i)
+
+
+tau_p_trap     = ones(1,length(psi));
+tau_n_trap     = ones(1,length(psi));
+
+i = i + 1;
+while (~strcmp(C{1}{i},'end') )
+    switch C{1}{i}
+        case 'hole_capture'
+            i=i+1;
+            while (~strcmp(C{1}{i},'end') )
+                switch C{1}{i}
+                    case 'define_function'
+                        i=i+1;
+                        while (~strcmp(C{1}{i},'end') )
+                            switch C{1}{i}
+                                case 'function'
+                                    i=i+1;
+                                    fun_line_no=i;
+                                    fun_string_p=C{1}{i};
+                                case 'variable'
+                                    i=i+1;
+                                    fun_variable_p=C{1}{i};
+                                otherwise 
+                                    i=i+1;
+                            end
+                        end
+                        i=i+1;
+                    otherwise
+                        i=i+1;
+                end               
+            end
+            try
+                fun_p = inline(fun_string_p,fun_variable_p);
+                for ii = 1:length(psi)
+                    tau_p_trap(ii) = fun_p(psi(ii));
+                end
+            catch
+                fprintf('error: Error while evaluating the expression in line no %d \n',fun_line_no);
+                %throwErr_unclassified();
+            end
+            i=i+1;     
+            
+        case 'electron_capture'
+            i=i+1;
+            while (~strcmp(C{1}{i},'end') )
+                switch C{1}{i}
+                    case 'define_function'
+                        i=i+1;
+                        while (~strcmp(C{1}{i},'end') )
+                            switch C{1}{i}
+                                case 'function'
+                                    i=i+1;
+                                    fun_line_no=i;
+                                    fun_string_n=C{1}{i}
+                                case 'variable'
+                                    i=i+1;
+                                    fun_variable_n=C{1}{i}
+                                otherwise 
+                                    i=i+1;
+                            end
+                        end
+                        i=i+1;
+                    otherwise
+                        i=i+1;
+                end               
+            end
+            try
+                fun_n = inline(fun_string_n,fun_variable_n);
+                for ii = 1:length(psi)
+                    tau_n_trap(ii) = fun_n(psi(ii));
+                end
+            catch
+                fprintf('error: Error while evaluating the expression in line no %d \n',fun_line_no);
+                %throwErr_unclassified();
+            end
+            i=i+1;     
+
+        otherwise
+            i=i+1;
+            
+    end
+end
+i=i+1;
+end
